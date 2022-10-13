@@ -10,6 +10,7 @@ import org.firstinspires.ftc.robotcore.external.matrices.VectorF;
 import org.firstinspires.ftc.robotcore.external.navigation.DistanceUnit;
 import org.firstinspires.ftc.teamcode.drivetrain.DrivetrainCommon;
 
+
 public class AutoCommon {
 
     public DrivetrainCommon chassis = null;
@@ -89,7 +90,6 @@ public class AutoCommon {
                     (chassis.robot.driveLF.isBusy() && chassis.robot.driveRF.isBusy()
                             && chassis.robot.driveLR.isBusy() && chassis.robot.driveRR.isBusy()
                     )) {
-
 
                 chassis.robot.driveLF.setPower(Math.abs(currentPower - correction));
                 chassis.robot.driveRF.setPower(Math.abs(currentPower + correction));
@@ -670,5 +670,9 @@ public class AutoCommon {
 
     }
 
+
+    public void driveToEnd(double driveSpeed, int pos){
+        encoderDrive(driveSpeed, 1000 * pos, 10, false);
+    }
 
 }

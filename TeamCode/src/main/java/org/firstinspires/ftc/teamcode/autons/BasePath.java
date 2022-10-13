@@ -22,30 +22,19 @@ public class BasePath extends LinearOpMode {
 
         auto.resetEncoders();
 
-        auto.encoderDrive(driveSpeed, 750, 10, false);
+        auto.encoderDrive(driveSpeed, 1200, 10, false);
 
-        auto.encoderStrafe(strafeSpeed, 10, 1200, false, false, false);
+        auto.encoderTurn(.5, -00, 10);
 
-        auto.encoderTurn(.5, 600, 30);
+        auto.encoderStrafe(strafeSpeed, 10, 1200, true, false, false);
 
-        auto.encoderStrafe(strafeSpeed, 10, 1200, false, false, false);
+        auto.encoderDrive(driveSpeed, 1000, 10, false);
 
-        auto.encoderDrive(driveSpeed, -750, 10, false);
+        auto.encoderTurn(.5, 775, 10);
 
-        auto.encoderTurn(.5, -600, 30);
+        auto.encoderDrive(driveSpeed, 1100, 10, false);
 
-        auto.encoderDrive(driveSpeed, -550, 10, false);
+        auto.encoderStrafe(strafeSpeed, 10, 2500, true, false, false);
 
-        auto.encoderTurn(.5, -650, 30);
-
-        auto.encoderDrive(driveSpeed, -1750, 10, false);
-
-        auto.encoderTurn(.5, 500, 30);
-
-        auto.encoderDrive(driveSpeed, -6550, 10, false);
-
-        auto.encoderTurn(.5, -700, 30);
-
-        auto.encoderDrive(driveSpeed, -3050, 10, false);
     }
 }
