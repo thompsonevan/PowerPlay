@@ -15,7 +15,7 @@ public class RightHigh extends LinearOpMode {
 
     boolean red=false;
 
-    double driveSpeed = .3;
+    double driveSpeed = .5;
     double strafeSpeed = .5;
     double driveSpeedslow = .05;
     int drivedistance1block = 1000;
@@ -36,11 +36,11 @@ public class RightHigh extends LinearOpMode {
 
         auto.resetEncoders();
 
-        auto.encoderDrive(driveSpeed, 100, 10, false);
+//        auto.encoderDrive(driveSpeed, 200, 10, false);
 
         auto.encoderStrafe(strafeSpeed, 10, 1300, true, false, false);
 
-        auto.encoderDrive(driveSpeed,1000, 10, false);
+        auto.encoderDrive(driveSpeed,1250, 10, false);
 
         auto.encoderStrafe(strafeSpeed, 10, 600, true, false, false);
 

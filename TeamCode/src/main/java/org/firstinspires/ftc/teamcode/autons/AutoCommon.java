@@ -22,6 +22,8 @@ public class AutoCommon {
 
     private LinearOpMode curOpMode = null;
 
+    double correction;
+
     public AutoCommon(LinearOpMode owningOpMode, boolean red) {
 
 
@@ -399,7 +401,11 @@ public class AutoCommon {
         double powerLeftFront;
         double powerRightFront;
 
-        double correction = 0;
+        if(pid){
+            correction = chassis.pidDrive.performPID(chassis.getAngle());
+        } else {
+            correction = 0;
+        }
 
         double currentPower = .1;
 
@@ -446,10 +452,18 @@ public class AutoCommon {
 
             currentPower = power;//rampUpDown(power,currentPower,.1,chassis.robot.driveRR.getCurrentPosition(),startDecelerationAt);
 
-            chassis.robot.driveRR.setPower(currentPower);
-            chassis.robot.driveLR.setPower(currentPower);
-            chassis.robot.driveLF.setPower(currentPower);
-            chassis.robot.driveRF.setPower(currentPower);
+            if(pid){
+                chassis.robot.driveRR.setPower(currentPower - correction);
+                chassis.robot.driveLR.setPower(currentPower + correction);
+                chassis.robot.driveLF.setPower(currentPower - correction);
+                chassis.robot.driveRF.setPower(currentPower + correction);
+            } else {
+                chassis.robot.driveRR.setPower(currentPower);
+                chassis.robot.driveLR.setPower(currentPower);
+                chassis.robot.driveLF.setPower(currentPower);
+                chassis.robot.driveRF.setPower(currentPower);
+            }
+
 /*
             if(objectDetection) {
                 blockLoc = vuforiaCom.executeDetection();
@@ -526,7 +540,7 @@ public class AutoCommon {
             }
 
 
-            correction = 0;//chassis.pidDrive.performPID(chassis.getAngle());
+            correction = chassis.pidDrive.performPID(chassis.getAngle());
             //Front Motors
             powerLeftFront = -slideSlowPower - correction;
             powerRightFront = slideSlowPower + correction;
