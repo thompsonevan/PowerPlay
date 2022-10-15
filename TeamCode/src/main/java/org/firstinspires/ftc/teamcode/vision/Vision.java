@@ -1,9 +1,10 @@
 // Turn this into a Auton common library instead of a teleop class
 
-package org.firstinspires.ftc.teamcode;
+package org.firstinspires.ftc.teamcode.vision;
 
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
+import com.qualcomm.robotcore.hardware.HardwareMap;
 
 import org.firstinspires.ftc.robotcore.external.hardware.camera.WebcamName;
 import org.opencv.core.Core;
@@ -29,6 +30,8 @@ public class Vision extends LinearOpMode {
 
     OpenCvWebcam webcam;
 
+    private int pos = 0;
+
     @Override
     public void runOpMode() {
         int cameraMonitorViewId = hardwareMap.appContext.getResources().getIdentifier("cameraMonitorViewId", "id", hardwareMap.appContext.getPackageName());
@@ -52,11 +55,11 @@ public class Vision extends LinearOpMode {
 
         while (opModeIsActive()) {
 
-            if(gVal > rVal && gVal > bVal) {
+            if(gVal > rVal && gVal > bVal && rVal < 200) {
                 yellowDetected = false;
                 greenDetected = true;
                 violetDetected = false;
-            } else if (gVal > 100) {
+            } else if (gVal > 200) {
                 yellowDetected = true;
                 greenDetected = false;
                 violetDetected = false;
@@ -76,6 +79,49 @@ public class Vision extends LinearOpMode {
 
             sleep(50);
         }
+    }
+
+    public void start(HardwareMap hardwareMap){
+        int cameraMonitorViewId = hardwareMap.appContext.getResources().getIdentifier("cameraMonitorViewId", "id", hardwareMap.appContext.getPackageName());
+        webcam = OpenCvCameraFactory.getInstance().createWebcam(hardwareMap.get(WebcamName.class, "Webcam 1"), cameraMonitorViewId);
+
+        webcam.setPipeline(new SkystoneDeterminationPipeline());
+
+        webcam.setMillisecondsPermissionTimeout(2500); // Timeout for obtaining permission is configurable. Set before opening.
+        webcam.openCameraDeviceAsync(new OpenCvCamera.AsyncCameraOpenListener() {
+            @Override
+            public void onOpened() {
+                webcam.startStreaming(320, 240, OpenCvCameraRotation.UPRIGHT);
+            }
+
+            @Override
+            public void onError(int errorCode) {
+            }
+        });
+    }
+
+    public int getPos(){
+
+        if(gVal > rVal && gVal > bVal && rVal < 200) {
+            pos = 0;
+        } else if (gVal > 200) {
+            pos = 1;
+        } else {
+            pos = 2;
+        }
+
+//        telemetry.addData("R", rVal);
+//        telemetry.addData("G", gVal);
+//        telemetry.addData("B", bVal);
+//        telemetry.addData("Yellow Detected", yellowDetected);
+//        telemetry.addData("Green Detected", greenDetected);
+//        telemetry.addData("Violet Detected", violetDetected);
+//        telemetry.addData("Pos", pos);
+//        telemetry.update();
+
+        sleep(50);
+
+        return pos;
     }
 
     public static class SkystoneDeterminationPipeline extends OpenCvPipeline {
