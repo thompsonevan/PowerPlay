@@ -75,18 +75,15 @@ public class LiftClawCommon {
 
     public LiftClawHardware robot = new LiftClawHardware();
 
-    private double claw_servoValue = 0;
-    private double grabber_servoValue = 0;
-    private int block_count;
     private int lift_position;
     private static final double DEFAULT_LIFT_SPEED = 0.5;
 
     private static final double FAST_LIFT_SPEED = .8;
-    private static final int ONE_INCH = 180;
-    private static final int STONE_HEIGHT = (int) (4.25 * ONE_INCH);
-    private static final int FOUNDATION_HEIGHT = 3 * ONE_INCH;
 
     private LinearOpMode curOpMode=null;
+
+    int pos = 0;
+    int lengthOfPos;
 
     private ElapsedTime     runtime = new ElapsedTime();
 
@@ -102,24 +99,15 @@ public class LiftClawCommon {
         robot.lift.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
         robot.lift.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
 
-        holdTension();
-
-        block_count = 0;
         lift_position = 0;
 
+        lengthOfPos = 4;
 
-        LIFT_POSITIONS.put(0,430);
-        LIFT_POSITIONS.put(1,1244);
-        LIFT_POSITIONS.put(2,1929);
-        LIFT_POSITIONS.put(3,2610);
-        LIFT_POSITIONS.put(4,3380);
-        LIFT_POSITIONS.put(5,4100);
-        LIFT_POSITIONS.put(6,4800);
-        LIFT_POSITIONS.put(7,4800);
-        LIFT_POSITIONS.put(8,4800);
-        LIFT_POSITIONS.put(9,4800);
-
-
+        LIFT_POSITIONS.put(0,0);
+        LIFT_POSITIONS.put(1, 150);
+        LIFT_POSITIONS.put(2, 750);
+        LIFT_POSITIONS.put(3, 1250);
+        LIFT_POSITIONS.put(4, 1740);
     }
 
     public void executeTeleop(){
@@ -131,17 +119,6 @@ public class LiftClawCommon {
         else if(curOpMode.gamepad2.right_bumper )//&& claw_servoValue!=.6)
         {
             closeClaw();
-        }
-
-        if(curOpMode.gamepad2.x)
-        {
-            robot.rightIntake.setPower(1);
-            robot.leftIntake.setPower(1);
-        }
-        else if(curOpMode.gamepad2.y)
-        {
-            robot.rightIntake.setPower(0);
-            robot.leftIntake.setPower(0);
         }
 
         if(curOpMode.gamepad2.b)
@@ -185,6 +162,30 @@ public class LiftClawCommon {
         {
             robot.lift.setPower(0);
         }
+
+        if(curOpMode.gamepad2.a){
+            if(pos == lengthOfPos){
+                pos = pos;
+            } else {
+                pos += 1;
+            }
+
+            encoderDrive(1, LIFT_POSITIONS.get(pos), 10);
+        }
+
+        if(curOpMode.gamepad2.b){
+            if(pos == 0){
+                pos = pos;
+            } else {
+                pos -= 1;
+            }
+
+
+            encoderDrive(1, LIFT_POSITIONS.get(pos), 10);
+        }
+
+
+
 
         curOpMode.telemetry.addLine().addData("encoder1:", robot.lift.getCurrentPosition());
     }
@@ -241,99 +242,7 @@ public class LiftClawCommon {
         encoderDrive(1,lift_position,15);
     }
 
-    /**
-     *    liftToDeposit(level)
-     *
-     *    Compound action:
-     *      1.  Move the lift so that the bottom of the stone will clear:
-     *              a.  the side of the foundation and the lugs on the foundation
-     *                 or
-     *              b.  one block higher than its previous position.
-     *                 or
-     *              c.  if level != 0 the height computed using level as the
-     *                  number of blocks to clear (possibly used by the
-     *                  autonomous mode).
-     *          Note:  When operating manually, the one block higher option
-     *          allows the operator to push a controller button as many times
-     *          as needed to clear the top of a tower under construction.
-     *      2.  Disengage the claw to release the stone.
-     */
-    public void liftToDeposit(int level)  //  move arm up to deposit stone
-    {
-        if (block_count == 0){
-            lift_position = FOUNDATION_HEIGHT + STONE_HEIGHT * level;  // set to 3", and if level
-            //        is not 0, the number of blocks higher that that.
-            encoderDrive(DEFAULT_LIFT_SPEED,lift_position,15);
-            block_count = 1;
-        }
-        else
-        {
-            lift_position += STONE_HEIGHT;  //  up 4" more
-            encoderDriveHoldPosition(DEFAULT_LIFT_SPEED,lift_position,15);
-            block_count += 1;
-        }
-    }
 
-    public void holdTension()
-    {
-
-     //   robot.lift.setPower(.005);
-    }
-
-    public void clearFloor() { //  move arm up to deposit stone
-        lift_position =100;
-
-        encoderDriveHoldPosition(FAST_LIFT_SPEED,lift_position,2);
-    }
-
-    public void raiseLevel() { //  move arm up to deposit stone
-            lift_position =LIFT_POSITIONS.get(block_count);
-
-            encoderDriveHoldPosition(FAST_LIFT_SPEED,lift_position,15);
-            block_count += 1;
-
-    }
-
-    public void lowerToDrop(){
-        lift_position -= ((int)(.2*ONE_INCH));  // down .25"
-
-        if(lift_position<=0)
-        {
-
-            lift_position=0;
-
-        }
-
-        encoderDriveHoldPosition(DEFAULT_LIFT_SPEED,lift_position,15);
-
-    }
-
-    /**
-     *    lowerOneBlock()
-     *
-     *    Move the lift down the height of one stone.
-     */
-    public void lowerOneBlock(){  // move lift down one block
-        lift_position -= STONE_HEIGHT;  // down 4"
-        encoderDrive(DEFAULT_LIFT_SPEED,lift_position,15);
-        block_count -= 1;
-    }
-
-    /**
-     *    depositStone()
-     *
-     *    Compound action:
-     *    1.  Lower the lift so that the stone is close to its target position.
-     *    2.  Disengage the claw so that the stone is released.
-     *
-     */
-    public void depositStone()
-    {
-        //  move the lift down to position the claw, disengage the claw, move up
-        lift_position = 132;  // down 0.75"
-        encoderDrive(DEFAULT_LIFT_SPEED,lift_position,15);
-        openClaw();
-    }
 
     /**
      *    returnToBottom()
@@ -344,7 +253,6 @@ public class LiftClawCommon {
     public void returnToBottom(){
         lift_position = 0;
         encoderDrive(FAST_LIFT_SPEED,lift_position,15);
-        block_count = 0;
     }
 
 

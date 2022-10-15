@@ -9,11 +9,13 @@ import com.vuforia.CameraDevice;
 import org.firstinspires.ftc.robotcore.external.matrices.VectorF;
 import org.firstinspires.ftc.robotcore.external.navigation.DistanceUnit;
 import org.firstinspires.ftc.teamcode.drivetrain.DrivetrainCommon;
+import org.firstinspires.ftc.teamcode.lift.LiftClawCommon;
 
 
 public class AutoCommon {
 
     public DrivetrainCommon chassis = null;
+    public LiftClawCommon lift = null;
 
     public VectorF blockLoc = null;
     public CameraDevice vufCam = null;
@@ -30,7 +32,7 @@ public class AutoCommon {
         curOpMode = owningOpMode;
 
         chassis = new DrivetrainCommon(curOpMode);
-
+        lift = new LiftClawCommon(curOpMode);
 
     }
 
