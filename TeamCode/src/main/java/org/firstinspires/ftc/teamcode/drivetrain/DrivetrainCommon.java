@@ -99,8 +99,8 @@ public class DrivetrainCommon {
     public void executeTeleop() {
 
 
-        xVal = curOpMode.gamepad1.left_stick_x;
-        yVal = -curOpMode.gamepad1.left_stick_y;
+        xVal = -curOpMode.gamepad1.left_stick_x;
+        yVal = curOpMode.gamepad1.left_stick_y;
 
         xVal_rs = curOpMode.gamepad1.right_stick_x;
 
@@ -318,28 +318,28 @@ public class DrivetrainCommon {
 
             if (curOpMode.gamepad1.dpad_left) {
                 //Left motors
-                powerLeftRear = slowPower;
+                powerLeftRear = -slowPower;
                 powerLeftFront = 0;
 
                 //Right Motors
                 powerRightRear = 0;
-                powerRightFront = slowPower;
+                powerRightFront = -slowPower;
             } else if (curOpMode.gamepad1.dpad_right) {
                 //Left motors
                 powerLeftRear = 0;
-                powerLeftFront = slowPower;
+                powerLeftFront = -slowPower;
 
                 //Right Motors
-                powerRightRear = slowPower;
+                powerRightRear = -slowPower;
                 powerRightFront = 0;
             } else {
                 //Left motors
-                powerLeftRear = slowPower;
-                powerLeftFront = slowPower;
+                powerLeftRear = -slowPower;
+                powerLeftFront = -slowPower;
 
                 //Right Motors
-                powerRightRear = slowPower;
-                powerRightFront = slowPower;
+                powerRightRear = -slowPower;
+                powerRightFront = -slowPower;
             }
         }
         //Slow backward
@@ -347,46 +347,34 @@ public class DrivetrainCommon {
 
             if (curOpMode.gamepad1.dpad_right) {
                 //Left motors
-                powerLeftRear = -slowPower;
+                powerLeftRear = slowPower;
                 powerLeftFront = 0;
 
                 //Right Motors
                 powerRightRear = 0;
-                powerRightFront = -slowPower;
+                powerRightFront = slowPower;
             } else if (curOpMode.gamepad1.dpad_left) {
                 //Left motors
                 powerLeftRear = 0;
-                powerLeftFront = -slowPower;
+                powerLeftFront = slowPower;
 
                 //Right Motors
-                powerRightRear = -slowPower;
+                powerRightRear = slowPower;
                 powerRightFront = 0;
             } else {
 
 
                 //Left motors
-                powerLeftRear = -slowPower;
-                powerLeftFront = -slowPower;
+                powerLeftRear = slowPower;
+                powerLeftFront = slowPower;
 
                 //Right Motors
-                powerRightRear = -slowPower;
-                powerRightFront = -slowPower;
+                powerRightRear = slowPower;
+                powerRightFront = slowPower;
             }
         }
         //Slow slide left
         else if (curOpMode.gamepad1.dpad_left) {
-
-            //Front Motors
-            powerLeftFront = -slideSlowPower;
-            powerRightFront = slideSlowPower;
-
-            //Rear Motors
-            powerRightRear = -slideSlowPower;
-            powerLeftRear = slideSlowPower;
-
-        }
-        //Slow slide right
-        else if (curOpMode.gamepad1.dpad_right) {
 
             //Front Motors
             powerLeftFront = slideSlowPower;
@@ -395,20 +383,32 @@ public class DrivetrainCommon {
             //Rear Motors
             powerRightRear = slideSlowPower;
             powerLeftRear = -slideSlowPower;
+
+        }
+        //Slow slide right
+        else if (curOpMode.gamepad1.dpad_right) {
+
+            //Front Motors
+            powerLeftFront = -slideSlowPower;
+            powerRightFront = slideSlowPower;
+
+            //Rear Motors
+            powerRightRear = -slideSlowPower;
+            powerLeftRear = slideSlowPower;
         }
         else if(curOpMode.gamepad1.right_bumper)
-        {
-            powerRightRear = -slowTurn;
-            powerLeftRear = slowTurn;
-            powerLeftFront = slowTurn;
-            powerRightFront = -slowTurn;
-        }
-        else if(curOpMode.gamepad1.left_bumper)
         {
             powerRightRear = slowTurn;
             powerLeftRear = -slowTurn;
             powerLeftFront = -slowTurn;
             powerRightFront = slowTurn;
+        }
+        else if(curOpMode.gamepad1.left_bumper)
+        {
+            powerRightRear = -slowTurn;
+            powerLeftRear = slowTurn;
+            powerLeftFront = slowTurn;
+            powerRightFront = -slowTurn;
         }
 
         robot.driveRR.setPower(powerRightRear);

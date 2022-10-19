@@ -20,6 +20,7 @@ public class RightLow extends LinearOpMode {
     double driveSpeedslow = .05;
     int drivedistance1block = 1000;
     int distancestrafe1block = 1200;
+    double liftSpeed = 1;
 
     int pos;
 
@@ -37,11 +38,19 @@ public class RightLow extends LinearOpMode {
 
         auto.resetEncoders();
 
+        auto.lift.closeClaw();
+
+        auto.lift.goToPos(liftSpeed, 1, 10);
+
         auto.encoderDrive(driveSpeed, 100, 10, false);
 
         auto.encoderStrafe(strafeSpeed, 10, 700, true, false, false);
 
         auto.encoderDrive(driveSpeed, 200, 10, false);
+
+        auto.lift.goToPos(liftSpeed,2 , 10);
+
+        auto.lift.openClaw();
 
         auto.encoderDrive(driveSpeed, -200, 10, false);
 

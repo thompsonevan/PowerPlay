@@ -190,6 +190,10 @@ public class LiftClawCommon {
         curOpMode.telemetry.addLine().addData("encoder1:", robot.lift.getCurrentPosition());
     }
 
+    public void goToPos(double speed, int pos, int timeout){
+        encoderDrive(speed, LIFT_POSITIONS.get(pos), timeout);
+    }
+
     private void initLiftClawHardware(){
 
         robot.init(curOpMode.hardwareMap);

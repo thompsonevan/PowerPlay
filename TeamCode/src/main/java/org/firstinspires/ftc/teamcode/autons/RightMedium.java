@@ -20,6 +20,7 @@ public class RightMedium extends LinearOpMode {
     double driveSpeedslow = .05;
     int drivedistance1block = 1000;
     int distancestrafe1block = 1200;
+    double liftSpeed = 1;
 
     int pos;
 
@@ -39,6 +40,10 @@ public class RightMedium extends LinearOpMode {
 
         auto.resetEncoders();
 
+        auto.lift.closeClaw();
+
+        auto.lift.goToPos(liftSpeed, 3, 10);
+
         auto.encoderDrive(driveSpeed, 100, 10, false);
 
         auto.encoderStrafe(strafeSpeed, 10, 1150, true, false, false);
@@ -48,6 +53,10 @@ public class RightMedium extends LinearOpMode {
         auto.encoderStrafe(strafeSpeed, 10, 500, false, false, false);
 
         auto.encoderDrive(driveSpeed, 200, 10, false);
+
+        auto.lift.goToPos(liftSpeed,2 , 10);
+
+        auto.lift.openClaw();
 
         auto.encoderDrive(driveSpeed, -200, 10, false);
 
