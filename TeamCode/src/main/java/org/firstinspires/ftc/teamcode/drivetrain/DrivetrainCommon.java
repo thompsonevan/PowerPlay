@@ -11,10 +11,13 @@ import org.firstinspires.ftc.robotcore.external.navigation.AxesReference;
 import org.firstinspires.ftc.robotcore.external.navigation.Orientation;
 import org.firstinspires.ftc.robotcore.external.Func;
 import org.firstinspires.ftc.teamcode.PIDController;
+import org.firstinspires.ftc.teamcode.vision.VuforiaCommon;
 
 public class DrivetrainCommon {
 
     public DrivetrainHardware robot = new DrivetrainHardware();
+
+    VuforiaCommon vuforia;
 
     // LiftClawHardware(); /* HT 15358 */
 
@@ -70,6 +73,8 @@ public class DrivetrainCommon {
         curOpMode = owningOpMode;
         initHardware();
 
+        vuforia = new VuforiaCommon(curOpMode);
+
         pidRotate = new PIDController(0, 0, 0);
         pidDrive = new PIDController(.05, 0, 0);
 
@@ -97,7 +102,7 @@ public class DrivetrainCommon {
     }
 
     public void executeTeleop() {
-
+        vuforia.detect();
 
         xVal = -curOpMode.gamepad1.left_stick_x;
         yVal = curOpMode.gamepad1.left_stick_y;
@@ -700,6 +705,8 @@ public class DrivetrainCommon {
     }
 
     public void printData(){
+        curOpMode.telemetry.addData("Pos (inches)", "{X, Y, Z, Heading} = %.1f, %.1f, %.1f, %.1f",
+        vuforia.getX(), vuforia.getY(), vuforia.getZ(), vuforia.getHeading());
         curOpMode.telemetry.addData("Left Front: ", robot.driveLF.getCurrentPosition());
         curOpMode.telemetry.addData("Left Rear: ", robot.driveLR.getCurrentPosition());
         curOpMode.telemetry.addData("Right Front: ", robot.driveRF.getCurrentPosition());
