@@ -6,7 +6,7 @@ import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 import com.qualcomm.robotcore.eventloop.opmode.Disabled;
 
 @TeleOp(name="Drivetrain Teleop")
-@Disabled
+//@Disabled
 public class DrivetrainTeleop extends LinearOpMode {
 
     @Override

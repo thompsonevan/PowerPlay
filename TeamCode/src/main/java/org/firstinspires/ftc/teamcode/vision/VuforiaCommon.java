@@ -50,48 +50,10 @@ import org.firstinspires.ftc.robotcore.external.navigation.VuforiaTrackables;
 import java.util.ArrayList;
 import java.util.List;
 
-/**
- * This OpMode illustrates using the Vuforia localizer to determine positioning and orientation of
- * robot on the FTC field using a WEBCAM.  The code is structured as a LinearOpMode
- *
- * NOTE: If you are running on a Phone with a built-in camera, use the ConceptVuforiaFieldNavigation example instead of this one.
- * NOTE: It is possible to switch between multiple WebCams (eg: one for the left side and one for the right).
- *       For a related example of how to do this, see ConceptTensorFlowObjectDetectionSwitchableCameras
- *
- * When images are located, Vuforia is able to determine the position and orientation of the
- * image relative to the camera.  This sample code then combines that information with a
- * knowledge of where the target images are on the field, to determine the location of the camera.
- *
- * Finally, the location of the camera on the robot is used to determine the
- * robot's location and orientation on the field.
- *
- * To learn more about the FTC field coordinate model, see FTC_FieldCoordinateSystemDefinition.pdf in this folder
- *
- * Use Android Studio to Copy this Class, and Paste it into your team's code folder with a new name.
- * Remove or comment out the @Disabled line to add this OpMode to the Driver Station OpMode list.
- *
- * IMPORTANT: In order to use this OpMode, you need to obtain your own Vuforia license key as
- * is explained below.
- */
-
 public class VuforiaCommon {
 
-    /*
-     * IMPORTANT: You need to obtain your own license key to use Vuforia. The string below with which
-     * 'parameters.vuforiaLicenseKey' is initialized is for illustration only, and will not function.
-     * A Vuforia 'Development' license key, can be obtained free of charge from the Vuforia developer
-     * web site at https://developer.vuforia.com/license-manager.
-     *
-     * Vuforia license keys are always 380 characters long, and look as if they contain mostly
-     * random data. As an example, here is a example of a fragment of a valid key:
-     *      ... yIgIzTqZ4mWjk9wd3cZO9T1axEqzuhxoGlfOOI2dRzKS4T0hQ8kT ...
-     * Once you've obtained a license key, copy the string from the Vuforia web site
-     * and paste it in to your code on the next line, between the double quotes.
-     */
     private static final String VUFORIA_KEY ="AWOMYEf/////AAABmeQNJVWIpUEUobo7rMTrW3J9LE0LLItl+o8HpdGFfIAQpxH8or0+bBtitpfo6F8dOWSmTVLtGCCxSQzaRgoyHKMqvvym15QRCdZz0KddtY1hLLVEhzT1gbM+LZCp10JH07xf+fCc25SWasurbi3hTbBf+evFzIOnUVY92kDY6kYa4k8e8JAzChRkSdkRcDdPyvDgr8aUVXLbfpN1gnP552k9UHZUmNl93Jq5GGr2JLTyB+ifwUo8HhwOFA/PiktftuVJokHj/63+0TnQJJAeJ6t6mEemcG38Y4m3nXbsNlQCCRletwBpuGGq5vNLe2DOAIzLzYUhgWw/z6rN5wgPFtqmpbXK7rSYkvuR0lue4omp";
 
-    // Since ImageTarget trackables use mm to specifiy their dimensions, we must use mm for all the physical dimension.
-    // We will define some constants and conversions here
     private static final float mmPerInch        = 25.4f;
     private static final float mmTargetHeight   = 6 * mmPerInch;          // the height of the center of the target image above the floor
     private static final float halfField        = 72 * mmPerInch;
@@ -123,12 +85,6 @@ public class VuforiaCommon {
 
         webcamName = hardwareMap.get(WebcamName.class, "Webcam 1");
 
-        /*
-         * Configure Vuforia by creating a Parameter object, and passing it to the Vuforia engine.
-         * We can pass Vuforia the handle to a camera preview resource (on the RC screen);
-         * If no camera-preview is desired, use the parameter-less constructor instead (commented out below).
-         * Note: A preview window is required if you want to view the camera stream on the Driver Station Phone.
-         */
         int cameraMonitorViewId = hardwareMap.appContext.getResources().getIdentifier("cameraMonitorViewId", "id", hardwareMap.appContext.getPackageName());
         VuforiaLocalizer.Parameters parameters = new VuforiaLocalizer.Parameters(cameraMonitorViewId);
         // VuforiaLocalizer.Parameters parameters = new VuforiaLocalizer.Parameters();
