@@ -2,6 +2,7 @@
 package org.firstinspires.ftc.teamcode.lift;
 
 import com.qualcomm.robotcore.hardware.DcMotor;
+import com.qualcomm.robotcore.hardware.DcMotorSimple;
 import com.qualcomm.robotcore.hardware.DistanceSensor;
 import com.qualcomm.robotcore.hardware.HardwareMap;
 import com.qualcomm.robotcore.hardware.Servo;
@@ -45,7 +46,7 @@ public class LiftClawHardware
         //rightIntake.setDirection(DcMotor.Direction.REVERSE);
         leftIntake.setDirection(DcMotor.Direction.REVERSE);
 
-        lift.setDirection(DcMotor.Direction.FORWARD);// Set to FORWARD if using AndyMark motors
+        lift.setDirection(DcMotor.Direction.REVERSE);// Set to FORWARD if using AndyMark motors
 
         // Set all motors to zero power
         lift.setPower(0);

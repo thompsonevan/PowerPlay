@@ -70,6 +70,7 @@ import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import org.firstinspires.ftc.robotcore.external.navigation.DistanceUnit;
 import org.firstinspires.ftc.teamcode.autons.AutoCommon;
 import org.firstinspires.ftc.teamcode.drivetrain.DrivetrainCommon;
+import org.firstinspires.ftc.teamcode.drivetrain.DrivetrainCommon_ALT1;
 
 public class LiftClawCommon {
 
@@ -82,14 +83,18 @@ public class LiftClawCommon {
 
     private LinearOpMode curOpMode=null;
 
-    int pos = 0;
+    int pos = 4;
     int lengthOfPos;
+
+    int rightPos =0;
+    int leftPos=0;
 
     private ElapsedTime     runtime = new ElapsedTime();
 
-   Map<Integer,Integer> LIFT_POSITIONS = new HashMap<>();
+    Map<Integer,Integer> LIFT_POSITIONS = new HashMap<>();
+    Map<Integer,Integer> STACK_POSITIONS = new HashMap<>();
 
-    public DrivetrainCommon chassis;
+    public DrivetrainCommon_ALT1 chassis;
 
     public LiftClawCommon(LinearOpMode owningOpMode){
 
@@ -104,10 +109,16 @@ public class LiftClawCommon {
         lengthOfPos = 4;
 
         LIFT_POSITIONS.put(0,0);
-        LIFT_POSITIONS.put(1, 150);
-        LIFT_POSITIONS.put(2, 750);
-        LIFT_POSITIONS.put(3, 1250);
-        LIFT_POSITIONS.put(4, 1740);
+        LIFT_POSITIONS.put(1, 300);
+        LIFT_POSITIONS.put(2, 1500);
+        LIFT_POSITIONS.put(3, 2500);
+        LIFT_POSITIONS.put(4, 3700);
+
+        STACK_POSITIONS.put(0,0);
+        STACK_POSITIONS.put(1, 137);
+        STACK_POSITIONS.put(2, 270);
+        STACK_POSITIONS.put(3, 405);
+        STACK_POSITIONS.put(4, 540);
     }
 
     public void executeTeleop(){
@@ -121,30 +132,32 @@ public class LiftClawCommon {
             closeClaw();
         }
 
-        if(curOpMode.gamepad2.b)
+        if(curOpMode.gamepad2.dpad_up)
         {
-           // returnToBottom();
+            encoderDrive(.8, LIFT_POSITIONS.get(4), 10);
         }
 
-        if(curOpMode.gamepad2.y)
+        if(curOpMode.gamepad2.dpad_left)
         {
-           // raiseLevel();
-        }
-
-        if(curOpMode.gamepad2.a)
-        {
-            //lowerToDrop();
+            encoderDrive(.8, LIFT_POSITIONS.get(3), 10);
         }
 
         if(curOpMode.gamepad2.dpad_down)
         {
+            encoderDrive(.8, LIFT_POSITIONS.get(2), 10);
+        }
+
+        curOpMode.telemetry.addData("yVal",curOpMode.gamepad2.left_stick_y);
+        curOpMode.telemetry.addData("curLiftVal",robot.lift.getCurrentPosition());
+        if(curOpMode.gamepad2.left_stick_y>0 && robot.lift.getCurrentPosition()>0) //Stick values flipped???
+        {
            // if (robot.lift.getCurrentPosition() >70 ){  // test for move down request
 
-                //robot.lift.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
+                robot.lift.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
 
                 robot.lift.setPower(-.3);
 
-                robot.lift.setTargetPosition(robot.lift.getCurrentPosition());
+                //robot.lift.setTargetPosition(robot.lift.getCurrentPosition());
 
                 // Turn On RUN_TO_POSITION
                 //robot.lift.setMode(DcMotor.RunMode.RUN_TO_POSITION);
@@ -152,36 +165,38 @@ public class LiftClawCommon {
            // }
 
         }
-        else if(curOpMode.gamepad2.dpad_up)
+        else if(curOpMode.gamepad2.left_stick_y<0 && robot.lift.getCurrentPosition()<2000)
         {
-
+            robot.lift.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
             robot.lift.setPower(.3);
 
         }
         else
         {
             robot.lift.setPower(0);
+            robot.lift.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
         }
 
-        if(curOpMode.gamepad2.a){
-            if(pos == lengthOfPos){
-                pos = pos;
-            } else {
-                pos += 1;
-            }
+        if(curOpMode.gamepad2.y){
 
-            encoderDrive(1, LIFT_POSITIONS.get(pos), 10);
+            encoderDrive(.4, STACK_POSITIONS.get(pos)+240, 10);
         }
 
-        if(curOpMode.gamepad2.b){
+        if(curOpMode.gamepad2.x){
+
+            encoderDrive(.4, STACK_POSITIONS.get(pos), 10);
+
             if(pos == 0){
                 pos = pos;
             } else {
                 pos -= 1;
             }
 
+        }
 
-            encoderDrive(1, LIFT_POSITIONS.get(pos), 10);
+        if(curOpMode.gamepad2.a)
+        {
+            pos=4;
         }
 
 
@@ -209,7 +224,8 @@ public class LiftClawCommon {
      *
      */
     public void closeClaw(){
-        robot.claw.setPosition(0.15);
+        //robot.claw.setPosition(0.16);//Value for Standard Metal Parts
+        robot.claw.setPosition(0.30);//Value for 3D Printed parts
         curOpMode.sleep(50);
     }
 
@@ -305,7 +321,7 @@ public class LiftClawCommon {
             // onto the next step, use (isBusy() || isBusy()) in the loop test.
             if (encoderValue > currentPosition) {  // if going up, no need to check
                 while (curOpMode.opModeIsActive() &&
-                        (runtime.seconds() < timeoutS) &&
+                        //(runtime.seconds() < timeoutS) &&
                         robot.lift.isBusy()) {
 
                     // Display it for the driver.
@@ -353,7 +369,7 @@ public class LiftClawCommon {
      * @param encoderValue
      * @param timeoutS
      */
-    public void encoderDriveHoldPosition(double speed,
+    public void mmmmmencoderDriveHoldPosition(double speed,
                              int encoderValue,
                              double timeoutS) {
 
