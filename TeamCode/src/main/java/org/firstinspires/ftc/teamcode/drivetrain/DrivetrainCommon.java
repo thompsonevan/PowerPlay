@@ -1,7 +1,17 @@
 
 package org.firstinspires.ftc.teamcode.drivetrain;
 
+import com.arcrobotics.ftclib.geometry.Pose2d;
+import com.arcrobotics.ftclib.geometry.Rotation2d;
+import com.arcrobotics.ftclib.geometry.Translation2d;
+import com.arcrobotics.ftclib.hardware.motors.Motor;
+import com.arcrobotics.ftclib.kinematics.wpilibkinematics.MecanumDriveKinematics;
+import com.arcrobotics.ftclib.kinematics.wpilibkinematics.MecanumDriveOdometry;
+import com.arcrobotics.ftclib.kinematics.wpilibkinematics.MecanumDriveWheelSpeeds;
+import com.qualcomm.hardware.motors.RevRobotics20HdHexMotor;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
+import com.qualcomm.robotcore.hardware.DcMotor;
+import com.qualcomm.robotcore.hardware.DcMotorEx;
 import com.qualcomm.robotcore.hardware.Gamepad;
 
 import java.util.Locale;
@@ -24,11 +34,31 @@ public class DrivetrainCommon {
 
     // LiftClawCommon(); /* HT 15358 */
 
+//    Motor.Encoder
+
     private double servoValue = 0;
 
     private LinearOpMode curOpMode = null;
 
     Orientation angles;
+
+    public double trackWidth = 0.3175;
+    public double wheelBase = 0.2286;
+
+    Translation2d frontLeftLocation =
+            new Translation2d(trackWidth / 2, wheelBase / 2);
+    Translation2d frontRightLocation =
+            new Translation2d(trackWidth / 2, -wheelBase / 2);
+    Translation2d backLeftLocation =
+            new Translation2d(-trackWidth / 2, wheelBase / 2);
+    Translation2d backRightLocation =
+            new Translation2d(-trackWidth / 2, -wheelBase / 2);
+
+    MecanumDriveKinematics kinematics = new MecanumDriveKinematics
+            (
+                    frontLeftLocation, frontRightLocation,
+                    backLeftLocation, backRightLocation
+            );
 
     Orientation lastAngles = new Orientation();
     public double globalAngle, currentAngle, power = .30, correction, rotation;
@@ -103,6 +133,10 @@ public class DrivetrainCommon {
         curOpMode.telemetry.addData("Mode", "waiting for start");
         curOpMode.telemetry.addData("imu calib status", robot.imu.getCalibrationStatus().toString());
         curOpMode.telemetry.update();
+    }
+
+    public double getMotorRates(DcMotorEx motor){
+        return (motor.getVelocity() / 560) * (2 * (Math.PI * .049));
     }
 
     public void executeTeleop() {
@@ -452,7 +486,7 @@ public class DrivetrainCommon {
             robot.driveLF.setPower(powerLeftFront);
             robot.driveRF.setPower(powerRightFront);
         }
-
+        updateWheelSpeeds();
         printData();
     }
 
@@ -727,6 +761,9 @@ public class DrivetrainCommon {
     } /*end of endgamespin */
 
 
+//    public double getDistance(){
+//
+//    }
 
     String formatAngle(AngleUnit angleUnit, double angle) {
         return formatDegrees(AngleUnit.DEGREES.fromUnit(angleUnit, angle));
@@ -736,6 +773,26 @@ public class DrivetrainCommon {
         return String.format(Locale.getDefault(), "%.1f", AngleUnit.DEGREES.normalize(degrees));
     }
 
+    Pose2d pose = new Pose2d();
+
+    MecanumDriveOdometry odometry = new MecanumDriveOdometry
+            (
+                    kinematics, Rotation2d.fromDegrees(0),
+                    new Pose2d(0, 0, new Rotation2d())
+                    );
+
+    public void updateWheelSpeeds(){
+        MecanumDriveWheelSpeeds wheelSpeeds = new MecanumDriveWheelSpeeds
+                (
+                        getMotorRates(robot.driveLF), getMotorRates(robot.driveRF),
+                        getMotorRates(robot.driveLR), getMotorRates(robot.driveRR)
+                );
+
+        Rotation2d gyroAngle = Rotation2d.fromDegrees(getAngle());
+
+        pose = odometry.updateWithTime(curOpMode.time, gyroAngle, wheelSpeeds);
+    }
+
     public void printData(){
         //curOpMode.telemetry.addData("Pos (inches)", "{X, Y, Z, Heading} = %.1f, %.1f, %.1f, %.1f",
         //vuforia.getX(), vuforia.getY(), vuforia.getZ(), vuforia.getHeading());
@@ -743,6 +800,10 @@ public class DrivetrainCommon {
         curOpMode.telemetry.addData("Left Rear: ", robot.driveLR.getCurrentPosition());
         curOpMode.telemetry.addData("Right Front: ", robot.driveRF.getCurrentPosition());
         curOpMode.telemetry.addData("Right Rear: ", robot.driveRR.getCurrentPosition());
+        curOpMode.telemetry.addData("Right Rear Speed", getMotorRates(robot.driveRR));
+        curOpMode.telemetry.addData("Right Rear Dist", robot.driveRR.getCurrentPosition()/1120);
+        curOpMode.telemetry.addData("X", pose.getX());
+        curOpMode.telemetry.addData("Y", pose.getY());
     }
 
 }
