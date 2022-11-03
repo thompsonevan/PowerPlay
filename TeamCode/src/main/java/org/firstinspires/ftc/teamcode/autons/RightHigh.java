@@ -34,16 +34,18 @@ public class RightHigh extends LinearOpMode {
     public void runOpMode() {
         auto = new AutoCommon(this, red);
 
-        Vision camera = new Vision();
-        camera.start(hardwareMap);
+       // Vision camera = new Vision();
+       // camera.start(hardwareMap);
 
         while(!isStarted()){
-            pos = camera.getPos();
+         //   pos = camera.getPos();
         }
 
         auto.resetEncoders();
 
         auto.lift.closeClaw();
+
+        sleep(1000);
 
         auto.lift.goToPos(liftSpeed, 1, 10);
 

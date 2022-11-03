@@ -2,19 +2,21 @@
 package org.firstinspires.ftc.teamcode.drivetrain;
 
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
+import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.Gamepad;
 
-import java.util.Locale;
+import org.firstinspires.ftc.robotcore.external.Func;
 import org.firstinspires.ftc.robotcore.external.navigation.AngleUnit;
 import org.firstinspires.ftc.robotcore.external.navigation.AxesOrder;
 import org.firstinspires.ftc.robotcore.external.navigation.AxesReference;
+import org.firstinspires.ftc.robotcore.external.navigation.DistanceUnit;
 import org.firstinspires.ftc.robotcore.external.navigation.Orientation;
-import org.firstinspires.ftc.robotcore.external.Func;
-import org.firstinspires.ftc.teamcode.Globals;
 import org.firstinspires.ftc.teamcode.PIDController;
-import org.firstinspires.ftc.teamcode.vision.VuforiaCommon;
+import org.firstinspires.ftc.teamcode.lift.LiftClawCommon;
 
-public class DrivetrainCommon {
+import java.util.Locale;
+
+public class DrivetrainCommon_ALT1 {
 
     public DrivetrainHardware robot = new DrivetrainHardware();
 
@@ -40,6 +42,7 @@ public class DrivetrainCommon {
     double powerRightFront;
 
 
+
     double yVal = 0;
     double xVal = 0;
 
@@ -58,8 +61,8 @@ public class DrivetrainCommon {
     double slideSlowPower = .25;
     double slowTurn =.2;
 
-    double max = .8;
-    double turnMax = .8;
+    double max = .5;
+    double turnMax = .5;
 
     Gamepad driverControl;
 
@@ -69,10 +72,23 @@ public class DrivetrainCommon {
     double controllerCap = .95;
     double speed = .75;
 
-    double powerShift = .15;
-    // Important Stuff
+    //Variables for refining responsiveness of joystick controls
+    double powerShift = 0;
+    double expVal = 3;
 
-    public DrivetrainCommon(LinearOpMode owningOpMode) {
+    boolean isPickupDropGood = false;
+    boolean isLiftUp = false;
+    boolean autoPickDropEnabled = false;
+    boolean startAutoPickDrop;
+
+    boolean autoRight = false;
+    boolean autoLeft = false;
+    double baseLineDist,leftMax,rightMax,centerMin,foreMin,aftMin;
+
+    double leftVal, rightVal,centerVal, foreVal, aftVal;
+    public LiftClawCommon liftClaw;
+
+    public DrivetrainCommon_ALT1(LinearOpMode owningOpMode) {
         curOpMode = owningOpMode;
         initHardware();
         angles = robot.imu.getAngularOrientation(AxesReference.INTRINSIC, AxesOrder.ZYX, AngleUnit.DEGREES);
@@ -102,28 +118,64 @@ public class DrivetrainCommon {
         composeTelemetry();
         curOpMode.telemetry.addData("Mode", "waiting for start");
         curOpMode.telemetry.addData("imu calib status", robot.imu.getCalibrationStatus().toString());
+
         curOpMode.telemetry.update();
     }
 
     public void executeTeleop() {
         //vuforia.detect();
 
+        if(curOpMode.gamepad1.a)
+        {
+            robot.driveRR.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
+            robot.driveLR.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
+            robot.driveLF.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
+            robot.driveRF.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
 
+            robot.driveRR.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
+            robot.driveLR.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
+            robot.driveLF.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
+            robot.driveRF.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
+
+            robot.driveRR.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
+            robot.driveLR.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
+            robot.driveLF.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
+            robot.driveRF.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
+        }
         angles = robot.imu.getAngularOrientation(AxesReference.INTRINSIC, AxesOrder.ZYX, AngleUnit.DEGREES);
 
-        xVal = -curOpMode.gamepad1.left_stick_x;
-        yVal = curOpMode.gamepad1.left_stick_y;
+        xVal = curOpMode.gamepad1.right_stick_x;
 
-        xVal_rs = curOpMode.gamepad1.right_stick_x;
+        yVal = -curOpMode.gamepad1.left_stick_y;
+
+
+        if (curOpMode.gamepad1.left_trigger > 0) {
+            xVal_rs = -curOpMode.gamepad1.left_trigger;
+        } else if (curOpMode.gamepad1.right_trigger > 0) {
+            xVal_rs = curOpMode.gamepad1.right_trigger;
+        } else {
+            xVal_rs = 0;
+        }
+
 
         correction = 0;
+        double leftTurnCorrection = 0;
+        double rightTurnCorrection = 0;
+
+        if (Math.abs(curOpMode.gamepad1.left_stick_x) > 0) {
+            correction = curOpMode.gamepad1.left_stick_x * .1;
+        } else if (Math.abs(curOpMode.gamepad1.right_stick_y) > 0) {
+            correction = curOpMode.gamepad1.right_stick_y * .1;
+        }
+
 
         boolean yDir = true;
 
         if (Math.abs(yVal) > Math.abs(xVal)) {
 
-          //  yDir = true;
+            //  yDir = true;
         }
+
 
         if (curOpMode.gamepad1.x) {
             robot.driveLF.setPower(-.35);
@@ -151,15 +203,15 @@ public class DrivetrainCommon {
             //Scale power based on exponential curve
 
             if (Math.abs(yVal) > 0) {
-                yVal = Math.signum(yVal) * (Math.pow(Math.abs(yVal), 4) + powerShift);
+                yVal = Math.signum(yVal) * (Math.pow(Math.abs(yVal), expVal) + powerShift);
             }
 
             if (Math.abs(xVal) > 0) {
-                xVal = Math.signum(xVal) * (Math.pow(Math.abs(xVal), 4) + powerShift);
+                xVal = Math.signum(xVal) * (Math.pow(Math.abs(xVal), expVal) + powerShift);
             }
 
             if (Math.abs(xVal_rs) > 0) {
-                xVal_rs = Math.signum(xVal_rs) * (Math.pow(Math.abs(xVal_rs), 4) + powerShift);
+                xVal_rs = Math.signum(xVal_rs) * (Math.pow(Math.abs(xVal_rs), expVal) + powerShift);
             }
 
 
@@ -180,9 +232,16 @@ public class DrivetrainCommon {
             xVal = xVal * max;
             xVal_rs = xVal_rs * turnMax;
 
-            double leftTurnCorrection = 0;
-            double rightTurnCorrection = 0;
+            curOpMode.telemetry.addData("X_Input:", curOpMode.gamepad1.right_stick_x);
+            curOpMode.telemetry.addData("X_Output:", xVal);
+            curOpMode.telemetry.addData("Y_Input:", curOpMode.gamepad1.left_stick_y);
+            curOpMode.telemetry.addData("Y_Output:", yVal);
 
+            if (curOpMode.gamepad1.left_bumper) {
+                xVal_rs = -slowTurn;
+            } else if (curOpMode.gamepad1.right_bumper) {
+                xVal_rs = slowTurn;
+            }
 
             if (Math.abs(xVal_rs) > 0) {
 
@@ -228,30 +287,80 @@ public class DrivetrainCommon {
                 resetAngle();
             }
 
-            curOpMode.telemetry.addData("CurrentAngle:",angles.firstAngle);
-            if(angles.firstAngle>=-45 && angles.firstAngle<=45)
-            {
-                driveVal=yVal;
-                strafeVal=xVal;
-            }
-            else if(angles.firstAngle>45 && angles.firstAngle<135)
-            {
-                driveVal=-xVal;
-                strafeVal=yVal;
-
-            }
-            else if(angles.firstAngle<-45 && angles.firstAngle>-135)
-            {
-                driveVal=xVal;
-                strafeVal=-yVal;
-            }
-            else if((angles.firstAngle<-135 && angles.firstAngle>=-180)
-                    || (angles.firstAngle<=180 && angles.firstAngle>135))
-            {
-                driveVal=-yVal;
-                strafeVal=-xVal;
+            if (correction > 0) {
+                rightTurnCorrection = correction;
+            } else {
+                leftTurnCorrection = correction;
             }
 
+
+            if (curOpMode.gamepad1.dpad_up) {
+                yVal = -slowPower;
+            } else if (curOpMode.gamepad1.dpad_down) {
+                yVal = slowPower;
+            } else if (curOpMode.gamepad1.dpad_left) {
+                xVal = -slowPower;
+            } else if (curOpMode.gamepad1.dpad_right) {
+                xVal = slowPower;
+            }
+
+            if (isLiftUp) {
+
+            } else {
+                isPickupDropGood = checkCones();
+            }
+
+            if (curOpMode.gamepad2.right_stick_button && autoPickDropEnabled) {
+
+                if (startAutoPickDrop) {
+                    leftMax = leftVal;
+                    rightMax = rightVal;
+                    centerMin = centerVal;
+
+
+                    startAutoPickDrop = false;
+                }
+                autoPickDrop();
+            } else {
+                autoLeft = false;
+                autoRight = false;
+                startAutoPickDrop = true;
+            }
+
+
+            curOpMode.telemetry.addData("CurrentAngle:", angles.firstAngle);
+
+
+            executeDrive(xVal,yVal,leftTurnCorrection,rightTurnCorrection,correction,true);
+        }
+    }
+        private void executeDrive(double xVal, double yVal,
+                                  double leftTurnCorrection, double rightTurnCorrection, double correction,
+                                  boolean yDir)
+        {
+
+            if (angles.firstAngle >= -45 && angles.firstAngle <= 45) {
+                driveVal = -yVal;
+                strafeVal = -xVal;
+                correction = -correction;  //Strafe correction good, flip drive correction
+                rightTurnCorrection = -rightTurnCorrection;
+                leftTurnCorrection = -leftTurnCorrection;
+            } else if (angles.firstAngle > 45 && angles.firstAngle < 135) {
+                driveVal = xVal; //GOOD
+                strafeVal = yVal; //GOOD
+                correction = -correction; //GOOD: Correction for Strafe & Drive Same
+            } else if (angles.firstAngle < -45 && angles.firstAngle > -135) {
+                driveVal = -xVal;
+                strafeVal = -yVal;
+
+                //strafe correction good, flip drive correction
+                rightTurnCorrection = -rightTurnCorrection;
+                leftTurnCorrection = -leftTurnCorrection;
+            } else if ((angles.firstAngle < -135 && angles.firstAngle >= -180)
+                    || (angles.firstAngle <= 180 && angles.firstAngle > 135)) {
+                driveVal = yVal;
+                strafeVal = xVal;
+            }
 
             //Drive forward
             if (driveVal > 0 && yDir) {
@@ -270,20 +379,19 @@ public class DrivetrainCommon {
             //Drive backward
             else if (driveVal < 0 && yDir) {
                 //Left motors
-                powerLeftRear = driveVal + rightTurnCorrection;
-                powerLeftFront = driveVal + rightTurnCorrection;
+                powerLeftRear = driveVal - rightTurnCorrection;
+                powerLeftFront = driveVal - rightTurnCorrection;
 
                 //Right Motors
-                powerRightRear = driveVal - leftTurnCorrection;
-                powerRightFront = driveVal - leftTurnCorrection;
+                powerRightRear = driveVal + leftTurnCorrection;
+                powerRightFront = driveVal + leftTurnCorrection;
 
 
             }
 
             //Slide Left/Right with no correction curve
-            else if (Math.abs(strafeVal) > 0 && Math.abs(curOpMode.gamepad1.right_stick_x) == 0) {
+            else if (Math.abs(strafeVal) > 0 && correction == 0) {
 
-                correction = 0;//pidDrive.performPID(getAngle());//*Math.max(Math.abs(yVal),Math.abs(xVal));
                 //Front Motors
                 powerLeftFront = strafeVal - correction;
                 powerRightFront = -strafeVal + correction;
@@ -295,32 +403,29 @@ public class DrivetrainCommon {
 
             }
             //Slide Left/Right with correction causing curved motion
-            else if (Math.abs(strafeVal) > 0 && Math.abs(xVal_rs) > 0) {
-
-                correction = xVal_rs;
-
+            else if (Math.abs(strafeVal) > 0 && Math.abs(correction) > 0) {
                 //Slide Left with forward curve
-                if (strafeVal < 0 && xVal_rs > 0) {
+                if (strafeVal < 0 && correction > 0) {
                     //Front Motors
-                    powerLeftFront = strafeVal + correction;
-                    powerRightFront = -strafeVal - correction;
+                    powerLeftFront = strafeVal - correction;
+                    powerRightFront = -strafeVal + correction;
 
                     //Rear Motors
                     powerRightRear = strafeVal;
                     powerLeftRear = -strafeVal;
                 }
                 //Slide Left with backward curve
-                else if (strafeVal < 0 && xVal_rs < 0) {
+                else if (strafeVal < 0 && correction < 0) {
                     //Front Motors
                     powerLeftFront = strafeVal;
                     powerRightFront = -strafeVal;
 
                     //Rear Motors
-                    powerRightRear = strafeVal - correction;
-                    powerLeftRear = -strafeVal + correction;
+                    powerRightRear = strafeVal + correction;
+                    powerLeftRear = -strafeVal - correction;
                 }
                 //Slide Right with backward curve
-                else if (strafeVal > 0 && xVal_rs > 0) {
+                else if (strafeVal > 0 && correction > 0) {
                     //Front Motors
                     powerLeftFront = strafeVal;
                     powerRightFront = -strafeVal;
@@ -330,7 +435,7 @@ public class DrivetrainCommon {
                     powerLeftRear = -strafeVal + correction;
                 }
                 //Slide right with forward curve
-                else if (strafeVal > 0 && xVal_rs < 0) {
+                else if (strafeVal > 0 && correction < 0) {
                     //Front Motors
                     powerLeftFront = strafeVal + correction;
                     powerRightFront = -strafeVal - correction;
@@ -346,115 +451,15 @@ public class DrivetrainCommon {
                 powerRightFront = 0;
             }
 
-
-            //Slow controls for forward/backward and slide left/right
-
-            //Slow forward
-            if (curOpMode.gamepad1.dpad_up) {
-
-                if (curOpMode.gamepad1.dpad_left) {
-                    //Left motors
-                    powerLeftRear = -slowPower;
-                    powerLeftFront = 0;
-
-                    //Right Motors
-                    powerRightRear = 0;
-                    powerRightFront = -slowPower;
-                } else if (curOpMode.gamepad1.dpad_right) {
-                    //Left motors
-                    powerLeftRear = 0;
-                    powerLeftFront = -slowPower;
-
-                    //Right Motors
-                    powerRightRear = -slowPower;
-                    powerRightFront = 0;
-                } else {
-                    //Left motors
-                    powerLeftRear = -slowPower;
-                    powerLeftFront = -slowPower;
-
-                    //Right Motors
-                    powerRightRear = -slowPower;
-                    powerRightFront = -slowPower;
-                }
-            }
-            //Slow backward
-            else if (curOpMode.gamepad1.dpad_down) {
-
-                if (curOpMode.gamepad1.dpad_right) {
-                    //Left motors
-                    powerLeftRear = slowPower;
-                    powerLeftFront = 0;
-
-                    //Right Motors
-                    powerRightRear = 0;
-                    powerRightFront = slowPower;
-                } else if (curOpMode.gamepad1.dpad_left) {
-                    //Left motors
-                    powerLeftRear = 0;
-                    powerLeftFront = slowPower;
-
-                    //Right Motors
-                    powerRightRear = slowPower;
-                    powerRightFront = 0;
-                } else {
-
-
-                    //Left motors
-                    powerLeftRear = slowPower;
-                    powerLeftFront = slowPower;
-
-                    //Right Motors
-                    powerRightRear = slowPower;
-                    powerRightFront = slowPower;
-                }
-            }
-            //Slow slide left
-            else if (curOpMode.gamepad1.dpad_left) {
-
-                //Front Motors
-                powerLeftFront = slideSlowPower;
-                powerRightFront = -slideSlowPower;
-
-                //Rear Motors
-                powerRightRear = slideSlowPower;
-                powerLeftRear = -slideSlowPower;
-
-            }
-            //Slow slide right
-            else if (curOpMode.gamepad1.dpad_right) {
-
-                //Front Motors
-                powerLeftFront = -slideSlowPower;
-                powerRightFront = slideSlowPower;
-
-                //Rear Motors
-                powerRightRear = -slideSlowPower;
-                powerLeftRear = slideSlowPower;
-            }
-            else if(curOpMode.gamepad1.right_bumper)
-            {
-                powerRightRear = slowTurn;
-                powerLeftRear = -slowTurn;
-                powerLeftFront = -slowTurn;
-                powerRightFront = slowTurn;
-            }
-            else if(curOpMode.gamepad1.left_bumper)
-            {
-                powerRightRear = -slowTurn;
-                powerLeftRear = slowTurn;
-                powerLeftFront = slowTurn;
-                powerRightFront = -slowTurn;
-            }
-
             robot.driveRR.setPower(powerRightRear);
             robot.driveLR.setPower(powerLeftRear);
             robot.driveLF.setPower(powerLeftFront);
             robot.driveRF.setPower(powerRightFront);
-        }
 
-        printData();
+            printData();
     }
+
+
 
     private void initHardware() {
 
@@ -506,6 +511,180 @@ public class DrivetrainCommon {
 
     }
 
+    public void autoPickDrop()
+    {
+
+        if(leftVal>leftMax)
+        {
+            leftMax=leftVal;
+        }
+
+        if(rightVal>rightMax)
+        {
+            rightMax=rightVal;
+        }
+
+        if(centerVal<centerMin)
+        {
+            centerMin=centerVal;
+        }
+
+        double autoDrivePower = .2;
+        double autoStrafePower=.1;
+        curOpMode.telemetry.addData("centerMin:",centerMin);
+        if(centerVal > 1.3){
+            if ((isPickupDropGood && !isLiftUp) || centerMin < 4 ){
+                while(centerVal>1.3 && checkCones() && curOpMode.opModeIsActive() && curOpMode.gamepad2.right_stick_button) {
+                    executeDrive(0, autoDrivePower, 0, 0, 0, true);
+                }
+            }
+            else if (!isPickupDropGood && !isLiftUp) {
+                //Shift Right
+                if(leftVal<rightVal) {
+                    while(!checkCones() && curOpMode.opModeIsActive() && curOpMode.gamepad2.right_stick_button)
+                    {
+                        executeDrive(-autoStrafePower,0,0,0,0,true);
+
+                    }
+                }
+                //Shift Left
+                if(leftVal>rightVal)
+                {
+                    while(!checkCones() && curOpMode.opModeIsActive() && curOpMode.gamepad2.right_stick_button)
+                    {
+                        executeDrive(autoStrafePower,0,0,0,0,true);
+
+                    }
+                }
+            }
+        }
+
+
+        //Pickup cone
+        else
+        {
+            autoPickDropEnabled=false;
+            autoRight=false;
+            autoLeft=false;
+
+            liftClaw.closeClaw();
+
+        }
+    }
+    public boolean checkCones() {
+
+        leftVal = robot.leftConeCheck.getDistance(DistanceUnit.INCH);
+        rightVal = robot.rightConeCheck.getDistance(DistanceUnit.INCH);
+        centerVal = robot.centerCheck.getDistance(DistanceUnit.INCH);
+
+        boolean clear = false;
+
+        double distanceThreshold = 10;
+
+        if((
+                //(( (centerVal - rightVal) <-1.5)  && ((centerVal-leftVal) <-1.5)) ||
+                (((centerVal+4)<rightVal)  && ((centerVal+4)<leftVal)) )
+                && centerVal<distanceThreshold)
+        {
+            robot.greenLed.setState(true);
+            robot.redLed.setState(false);
+
+            robot.greenLed2.setState(true);
+            robot.redLed2.setState(false);
+
+            robot.greenLed3.setState(true);
+            robot.redLed3.setState(false);
+
+
+            robot.greenLed4.setState(true);
+            robot.redLed4.setState(false);
+
+            clear = true;
+            autoPickDropEnabled=true;
+        }
+
+        else if ((Math.abs(leftVal-rightVal)>1.5)
+            && (leftVal<distanceThreshold || rightVal<distanceThreshold))
+        {
+            //need to shift left
+            if(leftVal<rightVal) {
+
+                robot.greenLed.setState(false);
+                robot.redLed.setState(true);
+
+                robot.greenLed3.setState(false);
+                robot.redLed3.setState(true);
+
+                robot.greenLed2.setState(true);
+                robot.redLed2.setState(false);
+
+                robot.greenLed4.setState(true);
+                robot.redLed4.setState(false);
+
+
+            }
+            //need to shift right
+            else if(leftVal>rightVal)
+            {
+                robot.greenLed.setState(true);
+                robot.redLed.setState(false);
+
+                robot.greenLed3.setState(true);
+                robot.redLed3.setState(false);
+
+                robot.greenLed2.setState(false);
+                robot.redLed2.setState(true);
+
+                robot.greenLed4.setState(false);
+                robot.redLed4.setState(true);
+
+            }
+            autoPickDropEnabled=true;
+            clear=false;
+        }
+        else if((centerVal<distanceThreshold) && (centerVal<leftVal) && centerVal<rightVal)
+        {
+            robot.greenLed.setState(true);
+            robot.redLed.setState(false);
+
+            robot.greenLed2.setState(true);
+            robot.redLed2.setState(false);
+
+            robot.greenLed3.setState(true);
+            robot.redLed3.setState(false);
+
+
+            robot.greenLed4.setState(true);
+            robot.redLed4.setState(false);
+
+            clear = true;
+            autoPickDropEnabled=true;
+        }
+        else
+        {
+
+            autoPickDropEnabled=false;
+            robot.greenLed.setState(false);
+            robot.redLed.setState(false);
+
+            robot.greenLed2.setState(false);
+            robot.redLed2.setState(false);
+
+            robot.greenLed3.setState(false);
+            robot.redLed3.setState(false);
+
+
+            robot.greenLed4.setState(false);
+            robot.redLed4.setState(false);
+        }
+
+        curOpMode.telemetry.addData("leftCheck:",leftVal);
+        curOpMode.telemetry.addData("rightCheck:",rightVal);
+        curOpMode.telemetry.addData("centerCheck:",centerVal);
+
+
+        return clear;
+    }
 
     /**
      * Resets the cumulative angle tracking to zero.

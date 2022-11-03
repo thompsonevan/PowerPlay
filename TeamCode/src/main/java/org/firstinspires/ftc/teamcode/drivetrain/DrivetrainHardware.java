@@ -19,6 +19,23 @@ public class DrivetrainHardware  {
 
     public BNO055IMU imu;
 
+    public DistanceSensor leftConeCheck;
+    public DistanceSensor rightConeCheck;
+    public DistanceSensor centerCheck;
+    public DistanceSensor junctionDriveDirCheck;
+
+    public DigitalChannel redLed;
+    public DigitalChannel greenLed;
+
+    public DigitalChannel redLed2;
+    public DigitalChannel greenLed2;
+
+    public DigitalChannel redLed3;
+    public DigitalChannel greenLed3;
+
+    public DigitalChannel redLed4;
+    public DigitalChannel greenLed4;
+
     HardwareMap hwMap           =  null;
     private ElapsedTime period  = new ElapsedTime();
 
@@ -36,6 +53,35 @@ public class DrivetrainHardware  {
 
         imu = ahwMap.get(BNO055IMU.class, "imu");
         imu.initialize(parameters);
+        leftConeCheck = hwMap.get(DistanceSensor.class, "leftConeCheck");
+        rightConeCheck = hwMap.get(DistanceSensor.class, "rightConeCheck");
+        junctionDriveDirCheck = hwMap.get(DistanceSensor.class, "junctionDriveDirCheck");
+        centerCheck = hwMap.get(DistanceSensor.class, "centerCheck");
+
+
+        redLed = hwMap.get(DigitalChannel.class, "red");
+        greenLed = hwMap.get(DigitalChannel.class, "green");
+
+        redLed2 = hwMap.get(DigitalChannel.class, "red2");
+        greenLed2 = hwMap.get(DigitalChannel.class, "green2");
+
+        redLed3 = hwMap.get(DigitalChannel.class, "red3");
+        greenLed3 = hwMap.get(DigitalChannel.class, "green3");
+
+        redLed4 = hwMap.get(DigitalChannel.class, "red4");
+        greenLed4 = hwMap.get(DigitalChannel.class, "green4");
+
+        redLed.setMode(DigitalChannel.Mode.OUTPUT);
+        greenLed.setMode(DigitalChannel.Mode.OUTPUT);
+
+        redLed2.setMode(DigitalChannel.Mode.OUTPUT);
+        greenLed2.setMode(DigitalChannel.Mode.OUTPUT);
+
+        redLed3.setMode(DigitalChannel.Mode.OUTPUT);
+        greenLed3.setMode(DigitalChannel.Mode.OUTPUT);
+
+        redLed4.setMode(DigitalChannel.Mode.OUTPUT);
+        greenLed4.setMode(DigitalChannel.Mode.OUTPUT);
 
         driveRR = hwMap.get(DcMotor.class, "drive_RR");
         driveLR = hwMap.get(DcMotor.class, "drive_LR");
@@ -51,6 +97,16 @@ public class DrivetrainHardware  {
         driveLR.setPower(0);
         driveLF.setPower(0);
         driveRF.setPower(0);
+
+        driveRR.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
+        driveLR.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
+        driveLF.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
+        driveRF.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
+
+        driveRR.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
+        driveLR.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
+        driveLF.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
+        driveRF.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
 
         driveRR.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
         driveLR.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
