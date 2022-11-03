@@ -112,7 +112,7 @@ public class LiftClawCommon {
         LIFT_POSITIONS.put(1, 300);
         LIFT_POSITIONS.put(2, 1500);
         LIFT_POSITIONS.put(3, 2500);
-        LIFT_POSITIONS.put(4, 3700);
+        LIFT_POSITIONS.put(4, 3450);
 
         STACK_POSITIONS.put(0,0);
         STACK_POSITIONS.put(1, 137);
@@ -165,7 +165,7 @@ public class LiftClawCommon {
            // }
 
         }
-        else if(curOpMode.gamepad2.left_stick_y<0 && robot.lift.getCurrentPosition()<2000)
+        else if(curOpMode.gamepad2.left_stick_y<0 && robot.lift.getCurrentPosition()<3500)
         {
             robot.lift.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
             robot.lift.setPower(.3);

@@ -9,13 +9,16 @@ import com.vuforia.CameraDevice;
 import org.firstinspires.ftc.robotcore.external.matrices.VectorF;
 import org.firstinspires.ftc.robotcore.external.navigation.DistanceUnit;
 import org.firstinspires.ftc.teamcode.drivetrain.DrivetrainCommon;
+import org.firstinspires.ftc.teamcode.drivetrain.DrivetrainCommon_ALT1;
 import org.firstinspires.ftc.teamcode.lift.LiftClawCommon;
 
 
 public class AutoCommon {
 
-    public DrivetrainCommon chassis = null;
+    public DrivetrainCommon_ALT1 chassis = null;
     public LiftClawCommon lift = null;
+
+//    public DrivetrainCommon_ALT1 drivetrain;
 
     public VectorF blockLoc = null;
     public CameraDevice vufCam = null;
@@ -31,8 +34,9 @@ public class AutoCommon {
 
         curOpMode = owningOpMode;
 
-        chassis = new DrivetrainCommon(curOpMode);
+        chassis = new DrivetrainCommon_ALT1(curOpMode);
         lift = new LiftClawCommon(curOpMode);
+//        drivetrain = new DrivetrainCommon_ALT1(curOpMode);
 
     }
 
@@ -686,6 +690,36 @@ public class AutoCommon {
 
     }
 
+    boolean outerPassed = false;
+
+    boolean isDone = false;
+
+    public boolean scanForPole(boolean goingRight){
+        double right = chassis.robot.leftConeCheck.getDistance(DistanceUnit.INCH);
+        double left = chassis.robot.rightConeCheck.getDistance(DistanceUnit.INCH);
+        double center = chassis.robot.centerCheck.getDistance(DistanceUnit.INCH);
+
+
+
+        if (goingRight) {
+            if (right > 10 && !outerPassed) {
+                chassis.executeDrive(-.2, 0, 0, 0, 0, true);
+            }
+            if (right < 10) {
+                outerPassed = true;
+            }
+            if (right > 10 && outerPassed) {
+                chassis.executeDrive(0, 0, 0, 0, 0, true);
+                isDone = true;
+            }
+        }
+
+        return isDone;
+    }
+
+    public void stopMotors(){
+        chassis.executeDrive(0, 0, 0, 0, 0, true);
+    }
 
     public void driveToEnd(double driveSpeed, int pos){
         encoderDrive(driveSpeed, 1000 * pos, 10, false);
