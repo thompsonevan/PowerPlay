@@ -295,9 +295,9 @@ public class DrivetrainCommon_ALT1 {
 
 
             if (curOpMode.gamepad1.dpad_up) {
-                yVal = -slowPower;
-            } else if (curOpMode.gamepad1.dpad_down) {
                 yVal = slowPower;
+            } else if (curOpMode.gamepad1.dpad_down) {
+                yVal = -slowPower;
             } else if (curOpMode.gamepad1.dpad_left) {
                 xVal = -slowPower;
             } else if (curOpMode.gamepad1.dpad_right) {
@@ -334,7 +334,7 @@ public class DrivetrainCommon_ALT1 {
             executeDrive(xVal,yVal,leftTurnCorrection,rightTurnCorrection,correction,true);
         }
     }
-        private void executeDrive(double xVal, double yVal,
+        public void executeDrive(double xVal, double yVal,
                                   double leftTurnCorrection, double rightTurnCorrection, double correction,
                                   boolean yDir)
         {
@@ -347,11 +347,11 @@ public class DrivetrainCommon_ALT1 {
                 leftTurnCorrection = -leftTurnCorrection;
             } else if (angles.firstAngle > 45 && angles.firstAngle < 135) {
                 driveVal = xVal; //GOOD
-                strafeVal = yVal; //GOOD
+                strafeVal = -yVal; //GOOD
                 correction = -correction; //GOOD: Correction for Strafe & Drive Same
             } else if (angles.firstAngle < -45 && angles.firstAngle > -135) {
                 driveVal = -xVal;
-                strafeVal = -yVal;
+                strafeVal = yVal;
 
                 //strafe correction good, flip drive correction
                 rightTurnCorrection = -rightTurnCorrection;
@@ -529,8 +529,8 @@ public class DrivetrainCommon_ALT1 {
             centerMin=centerVal;
         }
 
-        double autoDrivePower = .2;
-        double autoStrafePower=.1;
+        double autoDrivePower = -.2;
+        double autoStrafePower=.2;
         curOpMode.telemetry.addData("centerMin:",centerMin);
         if(centerVal > 1.3){
             if ((isPickupDropGood && !isLiftUp) || centerMin < 4 ){
