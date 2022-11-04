@@ -20,7 +20,7 @@ public class TeleopAll extends LinearOpMode {
         drivetrain = new DrivetrainCommon_ALT1(this);
        liftClaw = new LiftClawCommon(this);
 
-       liftClaw.chassis=drivetrain;
+//       liftClaw.chassis=drivetrain;
        drivetrain.liftClaw = liftClaw;
 
         waitForStart();

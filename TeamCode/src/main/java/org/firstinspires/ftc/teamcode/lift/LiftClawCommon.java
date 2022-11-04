@@ -70,7 +70,7 @@ import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import org.firstinspires.ftc.robotcore.external.navigation.DistanceUnit;
 import org.firstinspires.ftc.teamcode.autons.AutoCommon;
 import org.firstinspires.ftc.teamcode.drivetrain.DrivetrainCommon;
-import org.firstinspires.ftc.teamcode.drivetrain.DrivetrainCommon_ALT1;
+//import org.firstinspires.ftc.teamcode.drivetrain.DrivetrainCommon_ALT1;
 
 public class LiftClawCommon {
 
@@ -94,7 +94,7 @@ public class LiftClawCommon {
     Map<Integer,Integer> LIFT_POSITIONS = new HashMap<>();
     Map<Integer,Integer> STACK_POSITIONS = new HashMap<>();
 
-    public DrivetrainCommon_ALT1 chassis;
+//    public DrivetrainCommon_ALT1 chassis;
 
     public LiftClawCommon(LinearOpMode owningOpMode){
 
@@ -109,10 +109,10 @@ public class LiftClawCommon {
         lengthOfPos = 4;
 
         LIFT_POSITIONS.put(0,0);
-        LIFT_POSITIONS.put(1, 300);
-        LIFT_POSITIONS.put(2, 1500);
-        LIFT_POSITIONS.put(3, 2500);
-        LIFT_POSITIONS.put(4, 3450);
+        LIFT_POSITIONS.put(1, 200);
+        LIFT_POSITIONS.put(2, 1400);
+        LIFT_POSITIONS.put(3, 2400);
+        LIFT_POSITIONS.put(4, 3350);
 
         STACK_POSITIONS.put(0,0);
         STACK_POSITIONS.put(1, 137);
@@ -278,10 +278,10 @@ public class LiftClawCommon {
 
     public void checkDriverControls()
     {
-        if(chassis !=null)
-        {
-            chassis.executeTeleop();
-        }
+//        if(chassis !=null)
+//        {
+////            chassis.executeTeleop();
+//        }
     }
 
     /**

@@ -25,6 +25,12 @@ public class TestForScan extends LinearOpMode {
 
         waitForStart();
 
+//        auto.isDone = false;
+//
+//        sleep(1000);
+//
+//        auto.encoderStrafe(.2, 10, 750, false, false, false);
+//
         while(!auto.scanForPole(true));
     }
 }

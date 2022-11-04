@@ -44,23 +44,29 @@ public class RightLow extends LinearOpMode {
 
         auto.encoderDrive(driveSpeed, 100, 10, false);
 
-        auto.encoderStrafe(strafeSpeed, 10, 700, true, false, false);
+        auto.lift.goToPos(liftSpeed, 2, 10);
 
-        auto.encoderDrive(driveSpeed, 200, 10, false);
+        boolean done = false;
 
-        auto.lift.goToPos(liftSpeed,2 , 10);
+        while(!done){
+            done = auto.scanForPole(false);
+        }
 
-        auto.lift.openClaw();
+        if(done) {
+            auto.encoderDrive(driveSpeed, 200, 10, false);
 
-        auto.encoderDrive(driveSpeed, -200, 10, false);
+            auto.lift.openClaw();
 
-        auto.encoderStrafe(strafeSpeed, 10, 550, true, false, false);
+            auto.encoderDrive(driveSpeed, -200, 10, false);
 
-        auto.encoderDrive(driveSpeed, 2100, 10, false);
+            auto.encoderStrafe(strafeSpeed, 10, 550, true, false, false);
 
-        auto.encoderTurn(.50, -730, 10);
+            auto.encoderDrive(driveSpeed, 2100, 10, false);
 
-        auto.driveToEnd(driveSpeed, pos);
+            auto.encoderTurn(.50, -730, 10);
+
+            auto.driveToEnd(driveSpeed, pos);
+        }
     }
 
 }

@@ -699,26 +699,55 @@ public class AutoCommon {
         double left = chassis.robot.rightConeCheck.getDistance(DistanceUnit.INCH);
         double center = chassis.robot.centerCheck.getDistance(DistanceUnit.INCH);
 
-
-
         if (goingRight) {
-            if (right > 10 && !outerPassed) {
-                chassis.executeDrive(-.2, 0, 0, 0, 0, true);
+            if (right > 11.5 && !outerPassed) {
+                chassis.executeDrive(-.1, 0, 0, 0, 0, true);
             }
-            if (right < 10) {
+            if (right < 11.5) {
                 outerPassed = true;
             }
-            if (right > 10 && outerPassed) {
+            if (right > 11.5 && outerPassed) {
                 chassis.executeDrive(0, 0, 0, 0, 0, true);
                 isDone = true;
+//                outerPassed = false;
+            }
+        } else {
+            if (left > 11.5 && !outerPassed) {
+                chassis.executeDrive(.1, 0, 0, 0, 0, true);
+            }
+            if (left < 11.5) {
+                outerPassed = true;
+            }
+            if (left > 11.5 && outerPassed) {
+                chassis.executeDrive(0, 0, 0, 0, 0, true);
+                isDone = true;
+//                outerPassed = false;
             }
         }
+
+        curOpMode.telemetry.addData("Left Check", left);
+        curOpMode.telemetry.addData("Right Check", right);
+
+        curOpMode.telemetry.update();
 
         return isDone;
     }
 
-    public void stopMotors(){
-        chassis.executeDrive(0, 0, 0, 0, 0, true);
+    public boolean isIn = false;
+    public boolean junctionPassed = false;
+
+    public boolean driveIntoPole(){
+        if (chassis.robot.junctionDriveDirCheck.getDistance(DistanceUnit.INCH) < 5) {
+            junctionPassed = true;
+        }
+        if(!junctionPassed){
+            chassis.executeDrive(0, -.2, 0,0,0,true);
+        } else {
+            chassis.executeDrive(0, 0, 0,0,0,true);
+            isIn = true;
+        }
+
+        return isIn;
     }
 
     public void driveToEnd(double driveSpeed, int pos){

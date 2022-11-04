@@ -681,7 +681,7 @@ public class DrivetrainCommon_ALT1 {
         curOpMode.telemetry.addData("leftCheck:",leftVal);
         curOpMode.telemetry.addData("rightCheck:",rightVal);
         curOpMode.telemetry.addData("centerCheck:",centerVal);
-
+        curOpMode.telemetry.addData("junctionCheck", robot.junctionDriveDirCheck.getDistance(DistanceUnit.INCH));
 
         return clear;
     }
