@@ -1,6 +1,7 @@
 
 package org.firstinspires.ftc.teamcode.drivetrain;
 
+import com.qualcomm.hardware.bosch.BNO055IMU;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.Gamepad;
@@ -42,6 +43,8 @@ public class DrivetrainCommon_ALT1 {
     double powerRightFront;
 
 
+    int autoPickLoopCount = 0;
+    int stackPos=4;
 
     double yVal = 0;
     double xVal = 0;
@@ -80,13 +83,15 @@ public class DrivetrainCommon_ALT1 {
     boolean isLiftUp = false;
     boolean autoPickDropEnabled = false;
     boolean startAutoPickDrop;
-
+boolean atPickupLocation=false;
     boolean autoRight = false;
     boolean autoLeft = false;
     double baseLineDist,leftMax,rightMax,centerMin,foreMin,aftMin;
 
     double leftVal, rightVal,centerVal, foreVal, aftVal;
     public LiftClawCommon liftClaw;
+
+    boolean autoSequenceRunning=false;
 
     public DrivetrainCommon_ALT1(LinearOpMode owningOpMode) {
         curOpMode = owningOpMode;
@@ -124,9 +129,19 @@ public class DrivetrainCommon_ALT1 {
 
     public void executeTeleop() {
         //vuforia.detect();
+        if(curOpMode.gamepad2.back)
+        {
+            stackPos=4;
+        }
+
+        if(curOpMode.gamepad1.back)
+        {
+            robot.imu.initialize(robot.parameters);
+        }
 
         if(curOpMode.gamepad1.a)
         {
+
             robot.driveRR.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
             robot.driveLR.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
             robot.driveLF.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
@@ -146,7 +161,7 @@ public class DrivetrainCommon_ALT1 {
 
         xVal = curOpMode.gamepad1.right_stick_x;
 
-        yVal = -curOpMode.gamepad1.left_stick_y;
+        yVal = curOpMode.gamepad1.left_stick_y;
 
 
         if (curOpMode.gamepad1.left_trigger > 0) {
@@ -295,9 +310,9 @@ public class DrivetrainCommon_ALT1 {
 
 
             if (curOpMode.gamepad1.dpad_up) {
-                yVal = slowPower;
-            } else if (curOpMode.gamepad1.dpad_down) {
                 yVal = -slowPower;
+            } else if (curOpMode.gamepad1.dpad_down) {
+                yVal = slowPower;
             } else if (curOpMode.gamepad1.dpad_left) {
                 xVal = -slowPower;
             } else if (curOpMode.gamepad1.dpad_right) {
@@ -310,21 +325,22 @@ public class DrivetrainCommon_ALT1 {
                 isPickupDropGood = checkCones();
             }
 
-            if (curOpMode.gamepad2.right_stick_button && autoPickDropEnabled) {
-
+            if (curOpMode.gamepad2.right_stick_button && autoPickDropEnabled && !autoSequenceRunning ) {
+                autoSequenceRunning=true;
                 if (startAutoPickDrop) {
                     leftMax = leftVal;
                     rightMax = rightVal;
                     centerMin = centerVal;
 
-
-                    startAutoPickDrop = false;
                 }
                 autoPickDrop();
-            } else {
+                autoSequenceRunning=false;
+            }
+            else {
                 autoLeft = false;
                 autoRight = false;
                 startAutoPickDrop = true;
+                atPickupLocation=false;
             }
 
 
@@ -340,25 +356,25 @@ public class DrivetrainCommon_ALT1 {
         {
 
             if (angles.firstAngle >= -45 && angles.firstAngle <= 45) {
-                driveVal = -yVal;
+                driveVal = yVal;
                 strafeVal = -xVal;
                 correction = -correction;  //Strafe correction good, flip drive correction
                 rightTurnCorrection = -rightTurnCorrection;
                 leftTurnCorrection = -leftTurnCorrection;
             } else if (angles.firstAngle > 45 && angles.firstAngle < 135) {
                 driveVal = xVal; //GOOD
-                strafeVal = -yVal; //GOOD
+                strafeVal = yVal; //GOOD
                 correction = -correction; //GOOD: Correction for Strafe & Drive Same
             } else if (angles.firstAngle < -45 && angles.firstAngle > -135) {
                 driveVal = -xVal;
-                strafeVal = yVal;
+                strafeVal = -yVal;
 
                 //strafe correction good, flip drive correction
                 rightTurnCorrection = -rightTurnCorrection;
                 leftTurnCorrection = -leftTurnCorrection;
             } else if ((angles.firstAngle < -135 && angles.firstAngle >= -180)
                     || (angles.firstAngle <= 180 && angles.firstAngle > 135)) {
-                driveVal = yVal;
+                driveVal = -yVal;
                 strafeVal = xVal;
             }
 
@@ -514,6 +530,10 @@ public class DrivetrainCommon_ALT1 {
     public void autoPickDrop()
     {
 
+        autoPickLoopCount=0;
+
+        liftClaw.clearConeStack(false);
+
         if(leftVal>leftMax)
         {
             leftMax=leftVal;
@@ -529,46 +549,59 @@ public class DrivetrainCommon_ALT1 {
             centerMin=centerVal;
         }
 
-        double autoDrivePower = -.2;
-        double autoStrafePower=.2;
+        double autoDrivePower = .2;
+        double autoStrafePower=.12;
         curOpMode.telemetry.addData("centerMin:",centerMin);
-        if(centerVal > 1.3){
-            if ((isPickupDropGood && !isLiftUp) || centerMin < 4 ){
-                while(centerVal>1.3 && checkCones() && curOpMode.opModeIsActive() && curOpMode.gamepad2.right_stick_button) {
+        while(centerVal > 1.3 && curOpMode.gamepad2.right_stick_button
+                && curOpMode.opModeIsActive()) {
+                if(checkCones() && curOpMode.opModeIsActive() && curOpMode.gamepad2.right_stick_button
+                        && centerVal > 1.3) {
                     executeDrive(0, autoDrivePower, 0, 0, 0, true);
                 }
-            }
-            else if (!isPickupDropGood && !isLiftUp) {
-                //Shift Right
-                if(leftVal<rightVal) {
-                    while(!checkCones() && curOpMode.opModeIsActive() && curOpMode.gamepad2.right_stick_button)
-                    {
-                        executeDrive(-autoStrafePower,0,0,0,0,true);
+                if (!checkCones() && leftVal < rightVal) {
+                         executeDrive(-autoStrafePower, 0, 0, 0, 0, true);
 
-                    }
                 }
                 //Shift Left
-                if(leftVal>rightVal)
-                {
-                    while(!checkCones() && curOpMode.opModeIsActive() && curOpMode.gamepad2.right_stick_button)
-                    {
-                        executeDrive(autoStrafePower,0,0,0,0,true);
-
-                    }
+                if (!checkCones() && leftVal > rightVal) {
+                    executeDrive(autoStrafePower, 0, 0, 0, 0, true);
                 }
-            }
+        }
+        executeDrive(0,0,0,0,0,true);
+
+       if(curOpMode.gamepad2.right_stick_button) {
+
+           autoPickLoopCount++;
+
+                pickFromStack();
+
         }
 
+    }
 
-        //Pickup cone
-        else
+    public void pickFromStack()
+    {
+
+        autoPickDropEnabled=false;
+        autoRight=false;
+        autoLeft=false;
+
+        liftClaw.nextConeInStack(false, stackPos);
+
+        stackPos--;
+        autoPickLoopCount++;
+
+        curOpMode.telemetry.addData("liftLoop",liftClaw.autoLiftLoopCount);
+        curOpMode.telemetry.addData("pickLoop",autoPickLoopCount);
+        curOpMode.telemetry.update();
+
+        liftClaw.closeClaw();
+      //  curOpMode.sleep(1000);
+        liftClaw.clearConeStack(false);
+
+        while (centerVal<12 && curOpMode.gamepad2.right_stick_button)
         {
-            autoPickDropEnabled=false;
-            autoRight=false;
-            autoLeft=false;
-
-            liftClaw.closeClaw();
-
+            executeDrive(0, -.3, 0, 0, 0, true);
         }
     }
     public boolean checkCones() {
@@ -579,11 +612,11 @@ public class DrivetrainCommon_ALT1 {
 
         boolean clear = false;
 
-        double distanceThreshold = 10;
+        double distanceThreshold = 20;
 
         if((
                 //(( (centerVal - rightVal) <-1.5)  && ((centerVal-leftVal) <-1.5)) ||
-                (((centerVal+4)<rightVal)  && ((centerVal+4)<leftVal)) )
+                (((centerVal+1.5)<rightVal)  && ((centerVal+1.5)<leftVal)) )
                 && centerVal<distanceThreshold)
         {
             robot.greenLed.setState(true);
