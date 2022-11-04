@@ -39,6 +39,8 @@ public class DrivetrainHardware  {
     HardwareMap hwMap           =  null;
     private ElapsedTime period  = new ElapsedTime();
 
+    BNO055IMU.Parameters parameters = new BNO055IMU.Parameters();
+
     public DrivetrainHardware(){
 
     }
@@ -46,7 +48,7 @@ public class DrivetrainHardware  {
     public void init(HardwareMap ahwMap) {
         hwMap = ahwMap;
 
-        BNO055IMU.Parameters parameters = new BNO055IMU.Parameters();
+        //BNO055IMU.Parameters parameters = new BNO055IMU.Parameters();
         parameters.angleUnit           = BNO055IMU.AngleUnit.DEGREES;
         parameters.accelUnit           = BNO055IMU.AccelUnit.METERS_PERSEC_PERSEC;
         parameters.loggingEnabled      = false;
