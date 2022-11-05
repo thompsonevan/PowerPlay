@@ -741,7 +741,7 @@ public class AutoCommon {
             junctionPassed = true;
         }
         if(!junctionPassed){
-            chassis.executeDrive(0, -.2, 0,0,0,true);
+            chassis.executeDrive(0, .2, 0,0,0,true);
         } else {
             chassis.executeDrive(0, 0, 0,0,0,true);
             isIn = true;
@@ -750,8 +750,30 @@ public class AutoCommon {
         return isIn;
     }
 
-    public void driveToEnd(double driveSpeed, int pos){
-        encoderDrive(driveSpeed, 1000 * pos, 10, false);
+    public void driveToEnd(double driveSpeed, int pos, boolean high, boolean right){
+        if(right) {
+            if (high) {
+                encoderStrafe(driveSpeed, 10, 500 + (pos * 1300), false, false, false);
+            } else {
+                if(pos == 0){
+                    encoderStrafe(driveSpeed, 10, 500, true, false, false);
+                } else {
+                    encoderStrafe(driveSpeed, 10, 500 + (pos-1 * 1300), true, false, false);
+                }
+            }
+        } else {
+            if (high) {
+                encoderStrafe(driveSpeed, 10, 500 + (Math.abs(pos-2) * 1300), true, false, false);
+            } else {
+                if(pos == 2){
+                    encoderStrafe(driveSpeed, 10, 500, false, false, false);
+                } else if (pos == 1){
+                    encoderStrafe(driveSpeed, 10, 1800, true, false, false);
+                } else if (pos == 0){
+                    encoderStrafe(driveSpeed, 10, 3100, true, false, false);
+                }
+            }
+        }
     }
 
 }

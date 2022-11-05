@@ -78,11 +78,12 @@ public class RightMedium extends LinearOpMode {
 
                 auto.encoderDrive(driveSpeed, -400, 10, false);
 
-                auto.lift.goToPos(liftSpeed, 1, 10);
+                auto.lift.goToPos(liftSpeed, 0, 10);
 
-                auto.encoderStrafe(strafeSpeed, 10, 500 + (1300 * pos-1), false, false, false);
+                auto.driveToEnd(strafeSpeed, pos, false, true);
 
-                auto.encoderTurn(.50, -1625, 10);
+                auto.encoderTurn(.50, -1600, 10);
+
             }
         }
     }

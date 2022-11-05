@@ -7,7 +7,7 @@ import org.firstinspires.ftc.teamcode.drivetrain.DrivetrainCommon;
 import org.firstinspires.ftc.teamcode.drivetrain.DrivetrainCommon_ALT1;
 import org.firstinspires.ftc.teamcode.lift.LiftClawCommon;
 
-@TeleOp(name="Blue Teleop All", group="Pushbot")
+@TeleOp(name="TeleOp", group="Pushbot")
 //@Disabled
 
 public class TeleopAll extends LinearOpMode {
@@ -20,7 +20,7 @@ public class TeleopAll extends LinearOpMode {
         drivetrain = new DrivetrainCommon_ALT1(this);
        liftClaw = new LiftClawCommon(this);
 
-//       liftClaw.chassis=drivetrain;
+       liftClaw.chassis=drivetrain;
        drivetrain.liftClaw = liftClaw;
 
         waitForStart();

@@ -58,7 +58,7 @@ public class Vision extends LinearOpMode {
                 yellowDetected = false;
                 greenDetected = true;
                 violetDetected = false;
-            } else if (gVal > 200) {
+            } else if (gVal > 95) {
                 yellowDetected = true;
                 greenDetected = false;
                 violetDetected = false;

@@ -82,13 +82,13 @@ public class RightHigh extends LinearOpMode {
 
                 sleep(100);
 
-                auto.encoderDrive(driveSpeed, -400, 10, false);
+                auto.encoderDrive(driveSpeed, -300, 10, false);
 
-                auto.lift.goToPos(liftSpeed, 1, 10);
+                auto.lift.goToPos(liftSpeed, 0, 10);
 
-                auto.encoderStrafe(strafeSpeed, 10, 600 + (1300 * pos), false, false, false);
+                auto.driveToEnd(strafeSpeed, pos, true, true);
 
-                auto.encoderTurn(.50, -1625, 10);
+                auto.encoderTurn(.50, -1600, 10);
             }
         }
     }
