@@ -699,30 +699,81 @@ public class AutoCommon {
         double left = chassis.robot.rightConeCheck.getDistance(DistanceUnit.INCH);
         double center = chassis.robot.centerCheck.getDistance(DistanceUnit.INCH);
 
-
-
         if (goingRight) {
-            if (right > 10 && !outerPassed) {
-                chassis.executeDrive(-.2, 0,  true);
+            if (right > 11.5 && !outerPassed) {
+                chassis.executeDrive(-.1, 0, 0, 0, 0, true);
             }
-            if (right < 10) {
+            if (right < 11.5) {
                 outerPassed = true;
             }
-            if (right > 10 && outerPassed) {
-                chassis.executeDrive(0, 0, true);
+            if (right > 11.5 && outerPassed) {
+                chassis.executeDrive(0, 0, 0, 0, 0, true);
                 isDone = true;
+//                outerPassed = false;
+            }
+        } else {
+            if (left > 11.5 && !outerPassed) {
+                chassis.executeDrive(.1, 0, 0, 0, 0, true);
+            }
+            if (left < 11.5) {
+                outerPassed = true;
+            }
+            if (left > 11.5 && outerPassed) {
+                chassis.executeDrive(0, 0, 0, 0, 0, true);
+                isDone = true;
+//                outerPassed = false;
             }
         }
+
+        curOpMode.telemetry.addData("Left Check", left);
+        curOpMode.telemetry.addData("Right Check", right);
+
+        curOpMode.telemetry.update();
 
         return isDone;
     }
 
-    public void stopMotors(){
-        chassis.executeDrive(0, 0,  true);
+    public boolean isIn = false;
+    public boolean junctionPassed = false;
+
+    public boolean driveIntoPole(){
+        if (chassis.robot.junctionDriveDirCheck.getDistance(DistanceUnit.INCH) < 5) {
+            junctionPassed = true;
+        }
+        if(!junctionPassed){
+            chassis.executeDrive(0, .2, 0,0,0,true);
+        } else {
+            chassis.executeDrive(0, 0, 0,0,0,true);
+            isIn = true;
+        }
+
+        return isIn;
     }
 
-    public void driveToEnd(double driveSpeed, int pos){
-        encoderDrive(driveSpeed, 1000 * pos, 10, false);
+    public void driveToEnd(double driveSpeed, int pos, boolean high, boolean right){
+        if(right) {
+            if (high) {
+                encoderStrafe(driveSpeed, 10, 500 + (pos * 1300), false, false, false);
+            } else {
+                if(pos == 0){
+                    encoderStrafe(driveSpeed, 10, 500, true, false, false);
+                } else {
+                    encoderStrafe(driveSpeed, 10, 500 + (pos-1 * 1300), true, false, false);
+                }
+            }
+        } else {
+            if (high) {
+                encoderStrafe(driveSpeed, 10, 500 + (Math.abs(pos-2) * 1300), true, false, false);
+            } else {
+                if(pos == 2){
+                    encoderStrafe(driveSpeed, 10, 500, false, false, false);
+                } else if (pos == 1){
+                    encoderStrafe(driveSpeed, 10, 1800, true, false, false);
+                } else if (pos == 0){
+                    encoderStrafe(driveSpeed, 10, 3100, true, false, false);
+                }
+            }
+        }
     }
 
 }

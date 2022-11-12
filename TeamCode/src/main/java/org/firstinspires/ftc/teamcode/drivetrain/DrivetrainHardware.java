@@ -20,10 +20,10 @@ import com.qualcomm.hardware.bosch.BNO055IMU;
 import org.firstinspires.ftc.robotcore.external.navigation.CurrentUnit;
 
 public class DrivetrainHardware  {
-    public DcMotor  driveRR  = null;
-    public DcMotor  driveLR  = null;
-    public DcMotor  driveLF  = null;
-    public DcMotor  driveRF  = null;
+    public DcMotorEx driveRR  = null;
+    public DcMotorEx  driveLR  = null;
+    public DcMotorEx  driveLF  = null;
+    public DcMotorEx  driveRF  = null;
 
     public BNO055IMU imu;
 
@@ -97,10 +97,10 @@ public class DrivetrainHardware  {
         redLed4.setMode(DigitalChannel.Mode.OUTPUT);
         greenLed4.setMode(DigitalChannel.Mode.OUTPUT);
 
-        driveRR = hwMap.get(DcMotor.class, "drive_RR");
-        driveLR = hwMap.get(DcMotor.class, "drive_LR");
-        driveLF = hwMap.get(DcMotor.class, "drive_LF");
-        driveRF = hwMap.get(DcMotor.class, "drive_RF");
+        driveRR = hwMap.get(DcMotorEx.class, "drive_RR");
+        driveLR = hwMap.get(DcMotorEx.class, "drive_LR");
+        driveLF = hwMap.get(DcMotorEx.class, "drive_LF");
+        driveRF = hwMap.get(DcMotorEx.class, "drive_RF");
 
         driveRR.setDirection(DcMotor.Direction.FORWARD);
         driveLR.setDirection(DcMotor.Direction.REVERSE);

@@ -28,18 +28,21 @@ public class RightHigh extends LinearOpMode {
     double strafeSpeed = .5;
     double liftSpeed = 1;
 
-    int pos;
+    int pos = 2;
 
     @Override
     public void runOpMode() {
         auto = new AutoCommon(this, red);
 
-       // Vision camera = new Vision();
-       // camera.start(hardwareMap);
+        Vision camera = new Vision();
+        camera.start(hardwareMap);
 
         while(!isStarted()){
-         //   pos = camera.getPos();
+            pos = camera.getPos();
         }
+
+        telemetry.addData("pos", pos);
+        telemetry.update();
 
         auto.resetEncoders();
 
@@ -49,32 +52,44 @@ public class RightHigh extends LinearOpMode {
 
         auto.lift.goToPos(liftSpeed, 1, 10);
 
-        auto.encoderStrafe(strafeSpeed, 10, 1300, true, false, false);
+        auto.encoderStrafe(strafeSpeed, 10, 1150, true, false, false);
 
-        auto.encoderDrive(driveSpeed,1250, 10, false);
+        auto.encoderDrive(driveSpeed, -200, 10, false);
 
-        auto.encoderStrafe(strafeSpeed, 10, 590, true, false, false);
+        auto.encoderDrive(driveSpeed,1225, 10, false);
 
         auto.lift.goToPos(liftSpeed, 4, 10);
 
-        auto.encoderDrive(driveSpeed, 300, 10, false);
+        boolean done = false;
 
-        sleep(100);
+        while(!done){
+            done = auto.scanForPole(false);
+            sleep(150);
+        }
 
-        auto.lift.openClaw();
+        if(done) {
 
-        sleep(100);
+            boolean isIn = false;
 
-        auto.encoderDrive(driveSpeed, -300, 10, false);
+            while (!isIn) {
+                isIn = auto.driveIntoPole();
+            }
 
-        auto.lift.goToPos(liftSpeed, 1, 10);
+            if (isIn) {
+                sleep(100);
 
-        auto.encoderStrafe(strafeSpeed, 10, 600, false, false, false);
+                auto.lift.openClaw();
 
-        auto.encoderDrive(driveSpeed, 1100, 10, false);
+                sleep(100);
 
-        auto.encoderTurn(.5, -760, 10);
+                auto.encoderDrive(driveSpeed, -300, 10, false);
 
-        auto.driveToEnd(driveSpeed, pos);
+                auto.lift.goToPos(liftSpeed, 0, 10);
+
+                auto.driveToEnd(strafeSpeed, pos, true, true);
+
+                auto.encoderTurn(.50, -1600, 10);
+            }
+        }
     }
 }

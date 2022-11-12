@@ -22,7 +22,7 @@ public class RightMedium extends LinearOpMode {
     int distancestrafe1block = 1200;
     double liftSpeed = 1;
 
-    int pos;
+    int pos = 2;
 
     @Override
     public void runOpMode() {
@@ -35,38 +35,56 @@ public class RightMedium extends LinearOpMode {
             pos = camera.getPos();
         }
 
-
-
+        telemetry.addData("pos", pos);
+        telemetry.update();
 
         auto.resetEncoders();
 
         auto.lift.closeClaw();
 
-        auto.lift.goToPos(liftSpeed, 3, 10);
+        sleep(1000);
 
-        auto.encoderDrive(driveSpeed, 100, 10, false);
+        auto.lift.goToPos(liftSpeed, 1, 10);
 
         auto.encoderStrafe(strafeSpeed, 10, 1150, true, false, false);
 
-        auto.encoderDrive(driveSpeed, 1000, 10, false);
-
-        auto.encoderStrafe(strafeSpeed, 10, 500, false, false, false);
-
-        auto.encoderDrive(driveSpeed, 200, 10, false);
-
-        auto.lift.goToPos(liftSpeed,2 , 10);
-
-        auto.lift.openClaw();
-
         auto.encoderDrive(driveSpeed, -200, 10, false);
 
-        auto.encoderStrafe(strafeSpeed, 10, 500, true, false, false);
+        auto.encoderDrive(driveSpeed, 1300, 10, false);
 
-        auto.encoderDrive(driveSpeed, 1000, 10, false);
+        auto.lift.goToPos(liftSpeed, 3, 10);
 
-        auto.encoderTurn(.50, -730, 10);
 
-        auto.driveToEnd(driveSpeed, pos);
+        boolean done = false;
 
+        while(!done){
+            done = auto.scanForPole(true);
+            sleep(150);
+        }
+
+        if(done) {
+            boolean isIn = false;
+
+            while (!isIn) {
+                isIn = auto.driveIntoPole();
+            }
+
+            if (isIn) {
+                sleep(100);
+
+                auto.lift.openClaw();
+
+                sleep(100);
+
+                auto.encoderDrive(driveSpeed, -400, 10, false);
+
+                auto.lift.goToPos(liftSpeed, 0, 10);
+
+                auto.driveToEnd(strafeSpeed, pos, false, true);
+
+                auto.encoderTurn(.50, -1600, 10);
+
+            }
+        }
     }
 }

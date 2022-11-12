@@ -73,6 +73,7 @@ import org.firstinspires.ftc.robotcore.external.navigation.DistanceUnit;
 import org.firstinspires.ftc.teamcode.autons.AutoCommon;
 import org.firstinspires.ftc.teamcode.drivetrain.DrivetrainCommon;
 import org.firstinspires.ftc.teamcode.drivetrain.DrivetrainCommon_ALT1;
+//import org.firstinspires.ftc.teamcode.drivetrain.DrivetrainCommon_ALT1;
 
 public class LiftClawCommon {
 
@@ -114,9 +115,9 @@ public class LiftClawCommon {
 
         LIFT_POSITIONS.put(0,-30);
         LIFT_POSITIONS.put(1, 300);
-        LIFT_POSITIONS.put(2, 1341);
-        LIFT_POSITIONS.put(3, 2304);
-        LIFT_POSITIONS.put(4, 3300);
+        LIFT_POSITIONS.put(2, 1400);
+        LIFT_POSITIONS.put(3, 2400);
+        LIFT_POSITIONS.put(4, 3350);
 
         STACK_POSITIONS.put(0,0);
         STACK_POSITIONS.put(1, 105);

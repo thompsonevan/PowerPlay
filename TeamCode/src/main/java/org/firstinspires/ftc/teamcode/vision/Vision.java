@@ -58,7 +58,7 @@ public class Vision extends LinearOpMode {
                 yellowDetected = false;
                 greenDetected = true;
                 violetDetected = false;
-            } else if (gVal > 200) {
+            } else if (gVal > 95) {
                 yellowDetected = true;
                 greenDetected = false;
                 violetDetected = false;
@@ -101,13 +101,21 @@ public class Vision extends LinearOpMode {
 
     public int getPos(){
 
+//        if(gVal > rVal && gVal > bVal && rVal < 200) {
+//            pos = 0;
+//        } else if (gVal > 200) {
+//            pos = 1;
+//        } else {
+//            pos = 2;
+//        }
+
         if(gVal > rVal && gVal > bVal && rVal < 200) {
-            pos = 0;
-        } else if (gVal > 200) {
             pos = 1;
+        } else if (gVal > 95) {
+            pos = 0;
         } else {
             pos = 2;
-        }
+    }
 
 //        telemetry.addData("R", rVal);
 //        telemetry.addData("G", gVal);
