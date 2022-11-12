@@ -1,25 +1,16 @@
 
 package org.firstinspires.ftc.teamcode.drivetrain;
 
-import com.qualcomm.robotcore.hardware.ColorRangeSensor;
-import com.qualcomm.robotcore.hardware.DcMotor;
-import com.qualcomm.robotcore.hardware.DcMotorEx;
+import com.qualcomm.hardware.bosch.BNO055IMU;
 import com.qualcomm.hardware.rev.RevColorSensorV3;
-import com.qualcomm.hardware.lynx.LynxDigitalChannelController;
-import com.qualcomm.ftcrobotcontroller.R;
+import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.DcMotorSimple;
 import com.qualcomm.robotcore.hardware.DigitalChannel;
 import com.qualcomm.robotcore.hardware.DistanceSensor;
 import com.qualcomm.robotcore.hardware.HardwareMap;
-import com.qualcomm.robotcore.hardware.PIDCoefficients;
-import com.qualcomm.robotcore.hardware.Servo;
-import com.qualcomm.hardware.rev.RevTouchSensor;
 import com.qualcomm.robotcore.util.ElapsedTime;
-import com.qualcomm.hardware.bosch.BNO055IMU;
 
-import org.firstinspires.ftc.robotcore.external.navigation.CurrentUnit;
-
-public class DrivetrainHardware  {
+public class DrivetrainHardware_MOTORSONLY {
     public DcMotor  driveRR  = null;
     public DcMotor  driveLR  = null;
     public DcMotor  driveLF  = null;
@@ -27,31 +18,14 @@ public class DrivetrainHardware  {
 
     public BNO055IMU imu;
 
-    public DistanceSensor leftConeCheck;
-    public DistanceSensor rightConeCheck;
-    public DistanceSensor centerCheck;
-    public DistanceSensor junctionDriveDirCheck;
 
-    public DigitalChannel redLed;
-    public DigitalChannel greenLed;
-
-    public DigitalChannel redLed2;
-    public DigitalChannel greenLed2;
-
-    public DigitalChannel redLed3;
-    public DigitalChannel greenLed3;
-
-    public DigitalChannel redLed4;
-    public DigitalChannel greenLed4;
-
-    public RevColorSensorV3 revColor;
 
     HardwareMap hwMap           =  null;
     private ElapsedTime period  = new ElapsedTime();
 
     BNO055IMU.Parameters parameters = new BNO055IMU.Parameters();
 
-    public DrivetrainHardware(){
+    public DrivetrainHardware_MOTORSONLY(){
 
     }
 
@@ -67,35 +41,7 @@ public class DrivetrainHardware  {
         imu.initialize(parameters);
 
 
-        leftConeCheck = hwMap.get(DistanceSensor.class, "leftConeCheck");
-        rightConeCheck = hwMap.get(DistanceSensor.class, "rightConeCheck");
-        junctionDriveDirCheck = hwMap.get(DistanceSensor.class, "junctionDriveDirCheck");
-        centerCheck = hwMap.get(DistanceSensor.class, "centerCheck");
 
-
-        redLed = hwMap.get(DigitalChannel.class, "red");
-        greenLed = hwMap.get(DigitalChannel.class, "green");
-
-        redLed2 = hwMap.get(DigitalChannel.class, "red2");
-        greenLed2 = hwMap.get(DigitalChannel.class, "green2");
-
-        redLed3 = hwMap.get(DigitalChannel.class, "red3");
-        greenLed3 = hwMap.get(DigitalChannel.class, "green3");
-
-        redLed4 = hwMap.get(DigitalChannel.class, "red4");
-        greenLed4 = hwMap.get(DigitalChannel.class, "green4");
-
-        redLed.setMode(DigitalChannel.Mode.OUTPUT);
-        greenLed.setMode(DigitalChannel.Mode.OUTPUT);
-
-        redLed2.setMode(DigitalChannel.Mode.OUTPUT);
-        greenLed2.setMode(DigitalChannel.Mode.OUTPUT);
-
-        redLed3.setMode(DigitalChannel.Mode.OUTPUT);
-        greenLed3.setMode(DigitalChannel.Mode.OUTPUT);
-
-        redLed4.setMode(DigitalChannel.Mode.OUTPUT);
-        greenLed4.setMode(DigitalChannel.Mode.OUTPUT);
 
         driveRR = hwMap.get(DcMotor.class, "drive_RR");
         driveLR = hwMap.get(DcMotor.class, "drive_LR");

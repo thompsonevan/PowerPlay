@@ -703,13 +703,13 @@ public class AutoCommon {
 
         if (goingRight) {
             if (right > 10 && !outerPassed) {
-                chassis.executeDrive(-.2, 0, 0, 0, 0, true);
+                chassis.executeDrive(-.2, 0,  true);
             }
             if (right < 10) {
                 outerPassed = true;
             }
             if (right > 10 && outerPassed) {
-                chassis.executeDrive(0, 0, 0, 0, 0, true);
+                chassis.executeDrive(0, 0, true);
                 isDone = true;
             }
         }
@@ -718,7 +718,7 @@ public class AutoCommon {
     }
 
     public void stopMotors(){
-        chassis.executeDrive(0, 0, 0, 0, 0, true);
+        chassis.executeDrive(0, 0,  true);
     }
 
     public void driveToEnd(double driveSpeed, int pos){

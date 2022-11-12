@@ -1,5 +1,6 @@
 package org.firstinspires.ftc.teamcode.lift;
 import com.qualcomm.robotcore.hardware.DcMotor;
+import com.qualcomm.robotcore.hardware.DcMotorEx;
 import java.util.HashMap;
 import java.util.Map;
 /**
@@ -67,6 +68,7 @@ import com.qualcomm.robotcore.util.ElapsedTime;
 import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 
+import org.firstinspires.ftc.robotcore.external.navigation.CurrentUnit;
 import org.firstinspires.ftc.robotcore.external.navigation.DistanceUnit;
 import org.firstinspires.ftc.teamcode.autons.AutoCommon;
 import org.firstinspires.ftc.teamcode.drivetrain.DrivetrainCommon;
@@ -83,12 +85,12 @@ public class LiftClawCommon {
 
     private LinearOpMode curOpMode=null;
 
-    int pos = 4;
+    public int pos = 4;
     int lengthOfPos;
 
     int rightPos =0;
     int leftPos=0;
-
+    double maxCurrent=0;
     private ElapsedTime     runtime = new ElapsedTime();
 
     public int autoLiftLoopCount = 0;
@@ -117,9 +119,9 @@ public class LiftClawCommon {
         LIFT_POSITIONS.put(4, 3300);
 
         STACK_POSITIONS.put(0,0);
-        STACK_POSITIONS.put(1, 137);
+        STACK_POSITIONS.put(1, 105);
         STACK_POSITIONS.put(2, 270);
-        STACK_POSITIONS.put(3, 405);
+        STACK_POSITIONS.put(3, 380);
         STACK_POSITIONS.put(4, 540);
     }
 
@@ -136,26 +138,29 @@ public class LiftClawCommon {
 
         if(curOpMode.gamepad2.dpad_up)
         {
-            encoderDrive(1, LIFT_POSITIONS.get(3), 10);
+            encoderDrive(1, LIFT_POSITIONS.get(3), 2);
         }
 
         if(curOpMode.gamepad2.dpad_left)
         {
-            encoderDrive(1, LIFT_POSITIONS.get(2), 10);
+            encoderDrive(1, LIFT_POSITIONS.get(2),2 );
         }
 
         if(curOpMode.gamepad2.dpad_down)
         {
-            encoderDrive(1, LIFT_POSITIONS.get(1), 10);
+            encoderDrive(1, LIFT_POSITIONS.get(1), 3);
+
         }
 
         if(curOpMode.gamepad2.dpad_right)
         {
-            encoderDrive(1, LIFT_POSITIONS.get(4), 10);
+            encoderDrive(1, LIFT_POSITIONS.get(4), 3);
+
         }
 
         curOpMode.telemetry.addData("yVal",curOpMode.gamepad2.left_stick_y);
         curOpMode.telemetry.addData("curLiftVal",robot.lift.getCurrentPosition());
+        curOpMode.telemetry.addData("current:",maxCurrent);
         if(curOpMode.gamepad2.left_stick_y>0) //Stick values flipped???
         {
            // if (robot.lift.getCurrentPosition() >70 ){  // test for move down request
@@ -164,6 +169,7 @@ public class LiftClawCommon {
 
                 robot.lift.setPower(-.3);
 
+                curOpMode.telemetry.addData("Current:",robot.lift.getCurrent(CurrentUnit.AMPS));
                 //robot.lift.setTargetPosition(robot.lift.getCurrentPosition());
 
                 // Turn On RUN_TO_POSITION
@@ -172,10 +178,12 @@ public class LiftClawCommon {
            // }
 
         }
-        else if(curOpMode.gamepad2.left_stick_y<0 && robot.lift.getCurrentPosition()<3500)
+        else if(curOpMode.gamepad2.left_stick_y<0 && robot.lift.getCurrentPosition()<3800)
         {
             robot.lift.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
-            robot.lift.setPower(.3);
+            robot.lift.setPower(.5);
+
+            curOpMode.telemetry.addData("Current:",robot.lift.getCurrent(CurrentUnit.AMPS));
 
         }
         else
@@ -185,13 +193,13 @@ public class LiftClawCommon {
         }
 
         if(curOpMode.gamepad2.y){
-            clearConeStack(true);
-
+            //clearConeStack(true);
+            pos++;
         }
 
         if(curOpMode.gamepad2.x){
 
-          nextConeInStack(true, pos);
+          //nextConeInStack(true, pos);
 
             if(pos == 0){
                 pos = pos;
@@ -214,7 +222,7 @@ public class LiftClawCommon {
                 LIFT_POSITIONS.put(0,robot.lift.getCurrentPosition());
             }
 
-            encoderDrive(1, LIFT_POSITIONS.get(0), 10);
+            encoderDrive(1, LIFT_POSITIONS.get(0), 4);
         }
 
         if(curOpMode.gamepad2.left_stick_button)
@@ -228,12 +236,13 @@ public class LiftClawCommon {
 
     public void clearConeStack(boolean checkControls)
     {
-        encoderDrive(.4, STACK_POSITIONS.get(pos)+500, 2,checkControls);
+        encoderDrive(.4, STACK_POSITIONS.get(pos)+700, 2,checkControls);
     }
 
     public void nextConeInStack(boolean checkControls, int curPos)
     {
-        encoderDrive(.4, STACK_POSITIONS.get(curPos), 1,checkControls);
+        openClaw();
+        encoderDrive(.4, STACK_POSITIONS.get(curPos), 2,checkControls);
 
     }
 
@@ -345,6 +354,7 @@ public class LiftClawCommon {
             runtime.reset();
             robot.lift.setPower(speed);
 
+            curOpMode.telemetry.clear();
             // keep looping while we are still active, and there is time left, and both motors are running.
             // Note: We use (isBusy() && isBusy()) in the loop test, which means that when EITHER motor hits
             // its target position, the motion will stop.  This is "safer" in the event that the robot will
@@ -352,21 +362,6 @@ public class LiftClawCommon {
             // However, if you require that BOTH motors have finished their moves before the robot continues
             // onto the next step, use (isBusy() || isBusy()) in the loop test.
             if (encoderValue > currentPosition) {  // if going up, no need to check
-                while (curOpMode.opModeIsActive() &&
-                        //(runtime.seconds() < timeoutS) &&
-                        robot.lift.isBusy()) {
-
-                    // Display it for the driver.
-                    checkDriverControls();
-                    curOpMode.telemetry.addData("Path2", "Running at %7d",
-                            robot.lift.getCurrentPosition()
-                    );
-                    curOpMode.telemetry.update();
-                }
-            }
-            else
-            {  // moving down, don't pass zero!
-
                 while (curOpMode.opModeIsActive() &&
                         (runtime.seconds() < timeoutS) &&
                         robot.lift.isBusy()) {
@@ -376,9 +371,44 @@ public class LiftClawCommon {
                     curOpMode.telemetry.addData("Path2", "Running at %7d",
                             robot.lift.getCurrentPosition()
                     );
+                    curOpMode.telemetry.addData("Current:",robot.lift.getCurrent(CurrentUnit.AMPS));
                     curOpMode.telemetry.update();
                 }
+            }
+            else
+            {  // moving down, don't pass zero!
 
+                boolean currentExceeded = false;
+
+                while (curOpMode.opModeIsActive() &&
+                        (runtime.seconds() < timeoutS) &&
+                        robot.lift.isBusy()
+                        && !currentExceeded) {
+
+                    // Display it for the driver.
+                    checkDriverControls();
+                    curOpMode.telemetry.addData("Path2", "Running at %7d",
+                            robot.lift.getCurrentPosition()
+                    );
+                    curOpMode.telemetry.addData("Current:",robot.lift.getCurrent(CurrentUnit.AMPS));
+                    curOpMode.telemetry.update();
+
+                    if(robot.lift.getCurrent(CurrentUnit.AMPS)>maxCurrent)
+                    {
+                        maxCurrent=robot.lift.getCurrent(CurrentUnit.AMPS);
+
+                    }
+
+                    if(robot.lift.getCurrent(CurrentUnit.AMPS)>3)
+                    {
+                        currentExceeded=true;
+                    }
+                }
+                robot.lift.setPower(0);
+                if(currentExceeded && robot.lift.getCurrentPosition()>50)
+                {
+                    encoderDrive(1,robot.lift.getCurrentPosition()+300,3);
+                }
 
             }
             // Stop all motion;

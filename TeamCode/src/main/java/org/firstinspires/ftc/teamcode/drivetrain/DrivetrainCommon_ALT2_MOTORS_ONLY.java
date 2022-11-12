@@ -1,7 +1,6 @@
 
 package org.firstinspires.ftc.teamcode.drivetrain;
 
-import com.qualcomm.hardware.bosch.BNO055IMU;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.Gamepad;
@@ -17,9 +16,9 @@ import org.firstinspires.ftc.teamcode.lift.LiftClawCommon;
 
 import java.util.Locale;
 
-public class DrivetrainCommon_ALT1 {
+public class DrivetrainCommon_ALT2_MOTORS_ONLY {
 
-    public DrivetrainHardware robot = new DrivetrainHardware();
+    public DrivetrainHardware_MOTORSONLY robot = new DrivetrainHardware_MOTORSONLY();
 
    // VuforiaCommon vuforia;
 
@@ -102,7 +101,7 @@ public class DrivetrainCommon_ALT1 {
     double rightTurnCorrection = 0;
 
 
-    public DrivetrainCommon_ALT1(LinearOpMode owningOpMode) {
+    public DrivetrainCommon_ALT2_MOTORS_ONLY(LinearOpMode owningOpMode) {
         curOpMode = owningOpMode;
         initHardware();
         angles = robot.imu.getAngularOrientation(AxesReference.INTRINSIC, AxesOrder.ZYX, AngleUnit.DEGREES);
@@ -351,7 +350,7 @@ public class DrivetrainCommon_ALT1 {
             if (isLiftUp) {
 
             } else {
-                isPickupDropGood = checkCones();
+
             }
 
             if (curOpMode.gamepad2.right_stick_button && autoPickDropEnabled && !autoSequenceRunning ) {
@@ -362,7 +361,7 @@ public class DrivetrainCommon_ALT1 {
                     centerMin = centerVal;
 
                 }
-                autoPickDrop();
+
                 autoSequenceRunning=false;
             }
             else {
@@ -580,203 +579,7 @@ public class DrivetrainCommon_ALT1 {
 
     }
 
-    public void autoPickDrop()
-    {
 
-        autoPickLoopCount=0;
-
-        liftClaw.clearConeStack(false);
-
-        if(leftVal>leftMax)
-        {
-            leftMax=leftVal;
-        }
-
-        if(rightVal>rightMax)
-        {
-            rightMax=rightVal;
-        }
-
-        if(centerVal<centerMin)
-        {
-            centerMin=centerVal;
-        }
-
-
-        curOpMode.telemetry.addData("centerMin:",centerMin);
-        while(centerVal > 1.3 && curOpMode.gamepad2.right_stick_button
-                && curOpMode.opModeIsActive() && autoPickDropEnabled) {
-                if(checkCones() && curOpMode.opModeIsActive() && curOpMode.gamepad2.right_stick_button
-                        && centerVal > 1.3) {
-                    executeDrive(0, autoDrivePower,  true);
-                }
-                if (!checkCones() && leftVal < rightVal) {
-                         executeDrive(autoStrafePower, 0, true);
-
-                }
-                //Shift Left
-                if (!checkCones() && leftVal > rightVal) {
-                    executeDrive(-autoStrafePower, 0, true);
-                }
-        }
-        executeDrive(0,0,true);
-
-       if(curOpMode.gamepad2.right_stick_button) {
-
-           autoPickLoopCount++;
-
-                pickFromStack();
-
-        }
-
-    }
-
-    public void pickFromStack()
-    {
-
-        autoPickDropEnabled=false;
-        autoRight=false;
-        autoLeft=false;
-
-        liftClaw.nextConeInStack(false, liftClaw.pos);
-
-        if(liftClaw.pos>1) {
-            liftClaw.pos--;
-        }
-        else
-        {
-            liftClaw.pos=1;
-        }
-        autoPickLoopCount++;
-
-        curOpMode.telemetry.addData("liftLoop",liftClaw.autoLiftLoopCount);
-        curOpMode.telemetry.addData("pickLoop",autoPickLoopCount);
-        curOpMode.telemetry.update();
-
-        liftClaw.closeClaw();
-      //  curOpMode.sleep(1000);
-        liftClaw.clearConeStack(false);
-
-        while (curOpMode.gamepad2.right_stick_button)
-        {
-            executeDrive(0, -.3,  true);
-
-        }
-    }
-    public boolean checkCones() {
-
-        leftVal = robot.leftConeCheck.getDistance(DistanceUnit.INCH);
-        rightVal = robot.rightConeCheck.getDistance(DistanceUnit.INCH);
-        centerVal = robot.centerCheck.getDistance(DistanceUnit.INCH);
-
-        boolean clear = false;
-
-        double distanceThreshold = 20;
-
-        if((
-                //(( (centerVal - rightVal) <-1.5)  && ((centerVal-leftVal) <-1.5)) ||
-                (((centerVal+1.5)<rightVal)  && ((centerVal+1.5)<leftVal)) )
-                && centerVal<distanceThreshold)
-        {
-            robot.greenLed.setState(true);
-            robot.redLed.setState(false);
-
-            robot.greenLed2.setState(true);
-            robot.redLed2.setState(false);
-
-            robot.greenLed3.setState(true);
-            robot.redLed3.setState(false);
-
-
-            robot.greenLed4.setState(true);
-            robot.redLed4.setState(false);
-
-            clear = true;
-            autoPickDropEnabled=true;
-        }
-
-        else if ((Math.abs(leftVal-rightVal)>1.5)
-            && (leftVal<distanceThreshold || rightVal<distanceThreshold))
-        {
-            //need to shift left
-            if(leftVal<rightVal) {
-
-                robot.greenLed.setState(false);
-                robot.redLed.setState(true);
-
-                robot.greenLed3.setState(false);
-                robot.redLed3.setState(true);
-
-                robot.greenLed2.setState(true);
-                robot.redLed2.setState(false);
-
-                robot.greenLed4.setState(true);
-                robot.redLed4.setState(false);
-
-
-            }
-            //need to shift right
-            else if(leftVal>rightVal)
-            {
-                robot.greenLed.setState(true);
-                robot.redLed.setState(false);
-
-                robot.greenLed3.setState(true);
-                robot.redLed3.setState(false);
-
-                robot.greenLed2.setState(false);
-                robot.redLed2.setState(true);
-
-                robot.greenLed4.setState(false);
-                robot.redLed4.setState(true);
-
-            }
-            autoPickDropEnabled=true;
-            clear=false;
-        }
-        else if((centerVal<distanceThreshold) && (centerVal<leftVal) && centerVal<rightVal)
-        {
-            robot.greenLed.setState(true);
-            robot.redLed.setState(false);
-
-            robot.greenLed2.setState(true);
-            robot.redLed2.setState(false);
-
-            robot.greenLed3.setState(true);
-            robot.redLed3.setState(false);
-
-
-            robot.greenLed4.setState(true);
-            robot.redLed4.setState(false);
-
-            clear = true;
-            autoPickDropEnabled=true;
-        }
-        else
-        {
-
-            autoPickDropEnabled=false;
-            robot.greenLed.setState(false);
-            robot.redLed.setState(false);
-
-            robot.greenLed2.setState(false);
-            robot.redLed2.setState(false);
-
-            robot.greenLed3.setState(false);
-            robot.redLed3.setState(false);
-
-
-            robot.greenLed4.setState(false);
-            robot.redLed4.setState(false);
-        }
-
-        curOpMode.telemetry.addData("leftCheck:",leftVal);
-        curOpMode.telemetry.addData("rightCheck:",rightVal);
-        curOpMode.telemetry.addData("centerCheck:",centerVal);
-
-
-        return clear;
-    }
 
     public void turnToAngle(double target)
     {

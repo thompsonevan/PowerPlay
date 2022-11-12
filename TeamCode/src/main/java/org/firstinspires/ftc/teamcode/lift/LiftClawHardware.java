@@ -2,6 +2,7 @@
 package org.firstinspires.ftc.teamcode.lift;
 
 import com.qualcomm.robotcore.hardware.DcMotor;
+import com.qualcomm.robotcore.hardware.DcMotorEx;
 import com.qualcomm.robotcore.hardware.DcMotorSimple;
 import com.qualcomm.robotcore.hardware.DistanceSensor;
 import com.qualcomm.robotcore.hardware.HardwareMap;
@@ -17,7 +18,7 @@ public class LiftClawHardware
 {
     /* Public OpMode members. */
 
-    public DcMotor  lift  = null;
+    public DcMotorEx  lift  = null;
     public Servo    claw   = null;
     public CRServo leftIntake;
     public CRServo rightIntake;
@@ -40,7 +41,7 @@ public class LiftClawHardware
 
         // Define and Initialize Motors
 
-        lift = hwMap.get(DcMotor.class, "lift");
+        lift = (DcMotorEx) hwMap.get(DcMotor.class, "lift");
         leftIntake = hwMap.get(CRServo.class, "leftIntake");
         rightIntake = hwMap.get(CRServo.class, "rightIntake");
         //rightIntake.setDirection(DcMotor.Direction.REVERSE);
