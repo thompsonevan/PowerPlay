@@ -1,6 +1,8 @@
 
 package org.firstinspires.ftc.teamcode.drivetrain;
 
+import static org.firstinspires.ftc.teamcode.Robot.hwMap;
+
 import com.qualcomm.robotcore.hardware.ColorRangeSensor;
 import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.DcMotorEx;
@@ -9,6 +11,7 @@ import com.qualcomm.hardware.lynx.LynxDigitalChannelController;
 import com.qualcomm.ftcrobotcontroller.R;
 import com.qualcomm.robotcore.hardware.DcMotorSimple;
 import com.qualcomm.robotcore.hardware.DigitalChannel;
+import com.qualcomm.robotcore.hardware.DigitalChannelController;
 import com.qualcomm.robotcore.hardware.DistanceSensor;
 import com.qualcomm.robotcore.hardware.HardwareMap;
 import com.qualcomm.robotcore.hardware.PIDCoefficients;
@@ -19,59 +22,60 @@ import com.qualcomm.hardware.bosch.BNO055IMU;
 
 import org.firstinspires.ftc.robotcore.external.navigation.CurrentUnit;
 
-public class DrivetrainHardware  {
-    public DcMotorEx driveRR  = null;
-    public DcMotorEx  driveLR  = null;
-    public DcMotorEx  driveLF  = null;
-    public DcMotorEx  driveRF  = null;
+public final class DrivetrainHardware  {
+    public static DcMotorEx driveRR  = null;
+    public static DcMotorEx  driveLR  = null;
+    public static DcMotorEx  driveLF  = null;
+    public static DcMotorEx  driveRF  = null;
 
-    public BNO055IMU imu;
+    public static BNO055IMU imu;
 
-    public DistanceSensor leftConeCheck;
-    public DistanceSensor rightConeCheck;
-    public DistanceSensor centerCheck;
-    public DistanceSensor junctionDriveDirCheck;
+    public static DistanceSensor leftConeCheck;
+    public static DistanceSensor rightConeCheck;
+    public static DistanceSensor centerCheck;
+    public static DistanceSensor junctionDriveDirCheck;
 
-    public DigitalChannel redLed;
-    public DigitalChannel greenLed;
+    public static DigitalChannel redLed;
+    public static DigitalChannel greenLed;
 
-    public DigitalChannel redLed2;
-    public DigitalChannel greenLed2;
+    public static DigitalChannel redLed2;
+    public static DigitalChannel greenLed2;
 
-    public DigitalChannel redLed3;
-    public DigitalChannel greenLed3;
+    public static DigitalChannel redLedC1;
+    public static DigitalChannel greenLedC1;
 
-    public DigitalChannel redLed4;
-    public DigitalChannel greenLed4;
+    public static DigitalChannel redLedC2;
+    public static DigitalChannel greenLedC2;
+
+    public static DigitalChannel redLedC3;
+    public static DigitalChannel greenLedC3;
+
+    public static DigitalChannel redLedC4;
+    public static DigitalChannel greenLedC4;
+
+    public static DigitalChannel redLedC5;
+    public static DigitalChannel greenLedC5;
 
     public RevColorSensorV3 revColor;
 
-    HardwareMap hwMap           =  null;
-    private ElapsedTime period  = new ElapsedTime();
 
-    BNO055IMU.Parameters parameters = new BNO055IMU.Parameters();
+    private static ElapsedTime period  = new ElapsedTime();
 
-    public DrivetrainHardware(){
+    public static BNO055IMU.Parameters parameters = new BNO055IMU.Parameters();
 
-    }
-
-    public void init(HardwareMap ahwMap) {
-        hwMap = ahwMap;
-
+    public static void initDrivetrainHardware(){
         //BNO055IMU.Parameters parameters = new BNO055IMU.Parameters();
         parameters.angleUnit           = BNO055IMU.AngleUnit.DEGREES;
         parameters.accelUnit           = BNO055IMU.AccelUnit.METERS_PERSEC_PERSEC;
         parameters.loggingEnabled      = false;
 
-        imu = ahwMap.get(BNO055IMU.class, "imu");
+        imu = hwMap.get(BNO055IMU.class, "imu");
         imu.initialize(parameters);
-
 
         leftConeCheck = hwMap.get(DistanceSensor.class, "leftConeCheck");
         rightConeCheck = hwMap.get(DistanceSensor.class, "rightConeCheck");
         junctionDriveDirCheck = hwMap.get(DistanceSensor.class, "junctionDriveDirCheck");
         centerCheck = hwMap.get(DistanceSensor.class, "centerCheck");
-
 
         redLed = hwMap.get(DigitalChannel.class, "red");
         greenLed = hwMap.get(DigitalChannel.class, "green");
@@ -79,11 +83,23 @@ public class DrivetrainHardware  {
         redLed2 = hwMap.get(DigitalChannel.class, "red2");
         greenLed2 = hwMap.get(DigitalChannel.class, "green2");
 
-        redLed3 = hwMap.get(DigitalChannel.class, "red3");
-        greenLed3 = hwMap.get(DigitalChannel.class, "green3");
+        redLedC1 =hwMap.get(DigitalChannel.class, "C1red");
+        greenLedC1 = hwMap.get(DigitalChannel.class, "C1green");
 
-        redLed4 = hwMap.get(DigitalChannel.class, "red4");
-        greenLed4 = hwMap.get(DigitalChannel.class, "green4");
+        redLedC2 = hwMap.get(DigitalChannel.class, "C2red");
+        greenLedC2 = hwMap.get(DigitalChannel.class, "C2green");
+
+        redLedC3 = hwMap.get(DigitalChannel.class, "C3red");
+        greenLedC3 = hwMap.get(DigitalChannel.class, "C3green");
+
+        redLedC4 = hwMap.get(DigitalChannel.class, "C4red");
+        greenLedC4 = hwMap.get(DigitalChannel.class, "C4green");
+
+        redLedC5 = hwMap.get(DigitalChannel.class, "C5red");
+        greenLedC5 = hwMap.get(DigitalChannel.class, "C5green");
+
+
+
 
         redLed.setMode(DigitalChannel.Mode.OUTPUT);
         greenLed.setMode(DigitalChannel.Mode.OUTPUT);
@@ -91,11 +107,33 @@ public class DrivetrainHardware  {
         redLed2.setMode(DigitalChannel.Mode.OUTPUT);
         greenLed2.setMode(DigitalChannel.Mode.OUTPUT);
 
-        redLed3.setMode(DigitalChannel.Mode.OUTPUT);
-        greenLed3.setMode(DigitalChannel.Mode.OUTPUT);
+        redLedC1.setMode(DigitalChannel.Mode.OUTPUT);
+        greenLedC1.setMode(DigitalChannel.Mode.OUTPUT);
 
-        redLed4.setMode(DigitalChannel.Mode.OUTPUT);
-        greenLed4.setMode(DigitalChannel.Mode.OUTPUT);
+        redLedC2.setMode(DigitalChannel.Mode.OUTPUT);
+        greenLedC2.setMode(DigitalChannel.Mode.OUTPUT);
+
+        redLedC3.setMode(DigitalChannel.Mode.OUTPUT);
+        greenLedC3.setMode(DigitalChannel.Mode.OUTPUT);
+
+        redLedC4.setMode(DigitalChannel.Mode.OUTPUT);
+        greenLedC4.setMode(DigitalChannel.Mode.OUTPUT);
+
+        redLedC5.setMode(DigitalChannel.Mode.OUTPUT);
+        greenLedC5.setMode(DigitalChannel.Mode.OUTPUT);
+
+
+        redLedC1.setState(false);
+        redLedC2.setState(false);
+        redLedC3.setState(false);
+        redLedC4.setState(false);
+        redLedC5.setState(false);
+
+        greenLedC1.setState(true);
+        greenLedC2.setState(true);
+        greenLedC3.setState(true);
+        greenLedC4.setState(true);
+        greenLedC5.setState(true);
 
         driveRR = hwMap.get(DcMotorEx.class, "drive_RR");
         driveLR = hwMap.get(DcMotorEx.class, "drive_LR");
@@ -132,7 +170,5 @@ public class DrivetrainHardware  {
         driveLR.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
         driveRR.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
     }
-
-
 }
 

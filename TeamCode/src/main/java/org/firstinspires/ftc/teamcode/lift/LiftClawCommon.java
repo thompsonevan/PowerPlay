@@ -1,8 +1,17 @@
 package org.firstinspires.ftc.teamcode.lift;
+import static org.firstinspires.ftc.teamcode.Robot.DrivetrainLoopState;
+import static org.firstinspires.ftc.teamcode.Robot.curOpMode;
+import static org.firstinspires.ftc.teamcode.Robot.liftClaw;
+import static org.firstinspires.ftc.teamcode.Robot.operator;
+import static org.firstinspires.ftc.teamcode.drivetrain.DrivetrainCommon_ALT1.executeDrivetrainTeleop;
+import static org.firstinspires.ftc.teamcode.lift.LiftClawHardware.claw;
+import static org.firstinspires.ftc.teamcode.lift.LiftClawHardware.lift;
+
 import com.qualcomm.robotcore.hardware.DcMotor;
-import com.qualcomm.robotcore.hardware.DcMotorEx;
+
 import java.util.HashMap;
 import java.util.Map;
+import org.firstinspires.ftc.teamcode.Robot;
 /**
  *      LiftClawCommon  This class contains methods for operating the
  *
@@ -63,61 +72,52 @@ import java.util.Map;
  *
  */
 
-import com.qualcomm.robotcore.hardware.HardwareMap;
 import com.qualcomm.robotcore.util.ElapsedTime;
-import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 
 import org.firstinspires.ftc.robotcore.external.navigation.CurrentUnit;
-import org.firstinspires.ftc.robotcore.external.navigation.DistanceUnit;
-import org.firstinspires.ftc.teamcode.autons.AutoCommon;
-import org.firstinspires.ftc.teamcode.drivetrain.DrivetrainCommon;
 import org.firstinspires.ftc.teamcode.drivetrain.DrivetrainCommon_ALT1;
+import org.firstinspires.ftc.teamcode.drivetrain.DrivetrainHardware;
 //import org.firstinspires.ftc.teamcode.drivetrain.DrivetrainCommon_ALT1;
 
-public class LiftClawCommon {
+public final class LiftClawCommon {
 
-    public LiftClawHardware robot = new LiftClawHardware();
-
-    private int lift_position;
+    static boolean xPressed = false;
+    static boolean yPressed = false;
+    private static int lift_position;
     private static final double DEFAULT_LIFT_SPEED = 0.5;
 
     private static final double FAST_LIFT_SPEED = .8;
 
-    private LinearOpMode curOpMode=null;
-
-    public int pos = 4;
-    int lengthOfPos;
+    public static int pos = 5;
+    static int lengthOfPos;
 
     int rightPos =0;
     int leftPos=0;
-    double maxCurrent=0;
-    private ElapsedTime     runtime = new ElapsedTime();
+    static double maxCurrent=0;
+    private static ElapsedTime     runtime = new ElapsedTime();
 
-    public int autoLiftLoopCount = 0;
-
-    Map<Integer,Integer> LIFT_POSITIONS = new HashMap<>();
-    Map<Integer,Integer> STACK_POSITIONS = new HashMap<>();
+    static Map<Integer,Integer> LIFT_POSITIONS = new HashMap<>();
+    static Map<Integer,Integer> STACK_POSITIONS = new HashMap<>();
 
     public DrivetrainCommon_ALT1 chassis;
 
-    public LiftClawCommon(LinearOpMode owningOpMode){
+    public static void initLiftClawCommon(){
 
-        curOpMode=owningOpMode;
-        initLiftClawHardware();
+        LiftClawHardware.initLiftClawHardware();
 
-        robot.lift.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
-        robot.lift.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
+        lift.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
+        lift.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
 
         lift_position = 0;
 
         lengthOfPos = 4;
 
         LIFT_POSITIONS.put(0,-30);
-        LIFT_POSITIONS.put(1, 300);
+        LIFT_POSITIONS.put(1, 350);
         LIFT_POSITIONS.put(2, 1400);
         LIFT_POSITIONS.put(3, 2400);
-        LIFT_POSITIONS.put(4, 3350);
+        LIFT_POSITIONS.put(4, 3400);
 
         STACK_POSITIONS.put(0,0);
         STACK_POSITIONS.put(1, 105);
@@ -126,136 +126,220 @@ public class LiftClawCommon {
         STACK_POSITIONS.put(4, 540);
     }
 
-    public void executeTeleop(){
+    public static void executeLiftClawTeleop(){
 
-        if(curOpMode.gamepad2.left_bumper )//&& claw_servoValue>0)
+        if(operator.left_bumper )//&& claw_servoValue>0)
         {
             openClaw();
         }
-        else if(curOpMode.gamepad2.right_bumper )//&& claw_servoValue!=.6)
+        else if(operator.right_bumper )//&& claw_servoValue!=.6)
         {
             closeClaw();
         }
 
-        if(curOpMode.gamepad2.dpad_up)
+        if(operator.dpad_up)
         {
             encoderDrive(1, LIFT_POSITIONS.get(3), 2);
+
         }
 
-        if(curOpMode.gamepad2.dpad_left)
+        if(operator.dpad_left)
         {
             encoderDrive(1, LIFT_POSITIONS.get(2),2 );
         }
 
-        if(curOpMode.gamepad2.dpad_down)
+        if(operator.dpad_down)
         {
             encoderDrive(1, LIFT_POSITIONS.get(1), 3);
 
         }
 
-        if(curOpMode.gamepad2.dpad_right)
+        if(operator.dpad_right)
         {
             encoderDrive(1, LIFT_POSITIONS.get(4), 3);
 
         }
 
-        curOpMode.telemetry.addData("yVal",curOpMode.gamepad2.left_stick_y);
-        curOpMode.telemetry.addData("curLiftVal",robot.lift.getCurrentPosition());
-        curOpMode.telemetry.addData("current:",maxCurrent);
-        if(curOpMode.gamepad2.left_stick_y>0) //Stick values flipped???
+        if(operator.left_stick_y>0) //Stick values flipped???
         {
            // if (robot.lift.getCurrentPosition() >70 ){  // test for move down request
 
-                robot.lift.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
+                lift.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
 
-                robot.lift.setPower(-.3);
-
-                curOpMode.telemetry.addData("Current:",robot.lift.getCurrent(CurrentUnit.AMPS));
-                //robot.lift.setTargetPosition(robot.lift.getCurrentPosition());
-
-                // Turn On RUN_TO_POSITION
-                //robot.lift.setMode(DcMotor.RunMode.RUN_TO_POSITION);
-
-           // }
+                lift.setPower(-.3);
 
         }
-        else if(curOpMode.gamepad2.left_stick_y<0 && robot.lift.getCurrentPosition()<3800)
+        else if(operator.left_stick_y<0 && lift.getCurrentPosition()<3800)
         {
-            robot.lift.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
-            robot.lift.setPower(.5);
-
-            curOpMode.telemetry.addData("Current:",robot.lift.getCurrent(CurrentUnit.AMPS));
-
+            lift.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
+            lift.setPower(.5);
         }
         else
         {
-            robot.lift.setPower(0);
-            robot.lift.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
+            lift.setPower(0);
+            lift.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
         }
 
-        if(curOpMode.gamepad2.y){
-            //clearConeStack(true);
-            pos++;
+        if(operator.y && !yPressed){
+            yPressed=true;
+            //TODO:  ADD LED UPDATES
+           increaseConeStackCount();
         }
-
-        if(curOpMode.gamepad2.x){
-
-          //nextConeInStack(true, pos);
-
-            if(pos == 0){
-                pos = pos;
-            } else {
-                pos -= 1;
-            }
-
-        }
-
-        if(curOpMode.gamepad2.b)
+        else
         {
-            pos=4;
+            yPressed=false;
         }
 
-        if(curOpMode.gamepad2.a)
+        if(operator.x && !xPressed){
+
+            xPressed=true;
+          //TODO: ADD LED UPDATES
+            reduceConeStackCount();
+        }
+        else
+        {
+            xPressed=false;
+        }
+
+        if(operator.b)
+        {
+            //TODO: ADD LED UPDATES
+            pos=5;
+
+            DrivetrainHardware.redLedC1.setState(false);
+            DrivetrainHardware.redLedC2.setState(false);
+            DrivetrainHardware.redLedC3.setState(false);
+            DrivetrainHardware.redLedC4.setState(false);
+            DrivetrainHardware.redLedC5.setState(false);
+
+            DrivetrainHardware.greenLedC1.setState(true);
+            DrivetrainHardware.greenLedC2.setState(true);
+            DrivetrainHardware.greenLedC3.setState(true);
+            DrivetrainHardware.greenLedC4.setState(true);
+            DrivetrainHardware.greenLedC5.setState(true);
+
+        }
+
+        if(operator.a)
         {
             openClaw();
-            if(robot.lift.getCurrentPosition()<LIFT_POSITIONS.get(0))
+            if(lift.getCurrentPosition()<LIFT_POSITIONS.get(0))
             {
-                LIFT_POSITIONS.put(0,robot.lift.getCurrentPosition());
+                lift.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
+                lift.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
             }
 
             encoderDrive(1, LIFT_POSITIONS.get(0), 4);
         }
 
-        if(curOpMode.gamepad2.left_stick_button)
+        if(operator.left_stick_button)
         {
-            robot.lift.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
-            robot.lift.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
+            lift.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
+            lift.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
         }
 
-        curOpMode.telemetry.addLine().addData("encoder1:", robot.lift.getCurrentPosition());
     }
 
-    public void clearConeStack(boolean checkControls)
+    public static void clearConeStack(boolean checkControls)
     {
         encoderDrive(.4, STACK_POSITIONS.get(pos)+700, 2,checkControls);
     }
 
-    public void nextConeInStack(boolean checkControls, int curPos)
+    public static void nextConeInStack(boolean checkControls)
     {
         openClaw();
-        encoderDrive(.4, STACK_POSITIONS.get(curPos), 2,checkControls);
+        encoderDrive(.4, STACK_POSITIONS.get(pos), 3,checkControls);
 
     }
 
-    public void goToPos(double speed, int pos, int timeout){
+    public static void goToPos(double speed, int pos, int timeout){
         encoderDrive(speed, LIFT_POSITIONS.get(pos), timeout);
     }
 
-    private void initLiftClawHardware(){
+    public static void reduceConeStackCount()
+    {
+        if(pos > 0){
+            pos--;
+        }
 
-        robot.init(curOpMode.hardwareMap);
+        switch(pos)
+        {
+            case 4:
+            {
+                DrivetrainHardware.greenLedC5.setState(false);
+                DrivetrainHardware.redLedC5.setState(true);
+                break;
+            }
+            case 3:
+            {
+                DrivetrainHardware.greenLedC4.setState(false);
+                DrivetrainHardware.redLedC4.setState(true);
+                break;
+            }
+
+            case 2:
+            {
+                DrivetrainHardware.greenLedC3.setState(false);
+                DrivetrainHardware.redLedC3.setState(true);
+                break;
+            }
+
+            case 1:
+            {
+                DrivetrainHardware.greenLedC2.setState(false);
+                DrivetrainHardware.redLedC2.setState(true);
+                break;
+            }
+            case 0:
+            {
+                DrivetrainHardware.greenLedC1.setState(false);
+                DrivetrainHardware.redLedC1.setState(true);
+                break;
+            }
+        }
+
     }
+    public static void increaseConeStackCount()
+    {
+        if(pos<5) {
+            pos++;
+        }
+        switch(pos)
+        {
+            case 5:
+            {
+                DrivetrainHardware.greenLedC5.setState(true);
+                DrivetrainHardware.redLedC5.setState(false);
+                break;
+            }
+            case 4:
+            {
+                DrivetrainHardware.greenLedC4.setState(true);
+                DrivetrainHardware.redLedC4.setState(false);
+                break;
+            }
 
+            case 3:
+            {
+                DrivetrainHardware.greenLedC3.setState(true);
+                DrivetrainHardware.redLedC3.setState(false);
+                break;
+            }
+
+            case 2:
+            {
+                DrivetrainHardware.greenLedC2.setState(true);
+                DrivetrainHardware.redLedC2.setState(false);
+                break;
+            }
+            case 1:
+            {
+                DrivetrainHardware.greenLedC1.setState(true);
+                DrivetrainHardware.redLedC1.setState(false);
+                break;
+            }
+        }
+    }
 
 
     /**
@@ -265,9 +349,9 @@ public class LiftClawCommon {
      *    Activate the claw servo so that a stone may be grasped.
      *
      */
-    public void closeClaw(){
+    public static void closeClaw(){
         //robot.claw.setPosition(0.16);//Value for Standard Metal Parts
-        robot.claw.setPosition(0.30);//Value for 3D Printed parts
+        claw.setPosition(0.30);//Value for 3D Printed parts
         curOpMode.sleep(500);
     }
 
@@ -278,10 +362,11 @@ public class LiftClawCommon {
      *    Deactivate the claw servo so that a stone may be released.
      *
      */
-    public void openClaw(){
-        robot.claw.setPosition(0);
+    public static void openClaw(){
+        claw.setPosition(0);
         curOpMode.sleep(50);
     }
+
 
     /**
      *    pickUpStone()
@@ -318,12 +403,12 @@ public class LiftClawCommon {
     }
 
 
-    public void checkDriverControls()
+    public static void checkDriverControls()
     {
-        if(chassis !=null)
-        {
-            chassis.executeTeleop();
-        }
+
+            executeDrivetrainTeleop();
+
+
     }
 
     /**
@@ -335,25 +420,25 @@ public class LiftClawCommon {
      * @param encoderValue
      * @param timeoutS
      */
-    public void encoderDrive(double speed,
-                             int encoderValue,
-                             double timeoutS) {
+    public static void encoderDrive(double speed,
+                                    int encoderValue,
+                                    double timeoutS) {
 
         //(robot.lift_check.getDistance(DistanceUnit.INCH)>= 0)
 
         // Ensure that the opmode is still active
         if (curOpMode.opModeIsActive()) {
 
-            robot.lift.setTargetPosition(encoderValue);
-            int currentPosition = robot.lift.getCurrentPosition();
+            lift.setTargetPosition(encoderValue);
+            int currentPosition = lift.getCurrentPosition();
 
             // Turn On RUN_TO_POSITION
-            robot.lift.setMode(DcMotor.RunMode.RUN_TO_POSITION);
+            lift.setMode(DcMotor.RunMode.RUN_TO_POSITION);
 
 
             // reset the timeout time and start motion.
             runtime.reset();
-            robot.lift.setPower(speed);
+            lift.setPower(speed);
 
             curOpMode.telemetry.clear();
             // keep looping while we are still active, and there is time left, and both motors are running.
@@ -365,15 +450,11 @@ public class LiftClawCommon {
             if (encoderValue > currentPosition) {  // if going up, no need to check
                 while (curOpMode.opModeIsActive() &&
                         (runtime.seconds() < timeoutS) &&
-                        robot.lift.isBusy()) {
+                        lift.isBusy()) {
 
                     // Display it for the driver.
                     checkDriverControls();
-                    curOpMode.telemetry.addData("Path2", "Running at %7d",
-                            robot.lift.getCurrentPosition()
-                    );
-                    curOpMode.telemetry.addData("Current:",robot.lift.getCurrent(CurrentUnit.AMPS));
-                    curOpMode.telemetry.update();
+
                 }
             }
             else
@@ -383,64 +464,61 @@ public class LiftClawCommon {
 
                 while (curOpMode.opModeIsActive() &&
                         (runtime.seconds() < timeoutS) &&
-                        robot.lift.isBusy()
+                        lift.isBusy()
                         && !currentExceeded) {
 
                     // Display it for the driver.
                     checkDriverControls();
-                    curOpMode.telemetry.addData("Path2", "Running at %7d",
-                            robot.lift.getCurrentPosition()
-                    );
-                    curOpMode.telemetry.addData("Current:",robot.lift.getCurrent(CurrentUnit.AMPS));
-                    curOpMode.telemetry.update();
 
-                    if(robot.lift.getCurrent(CurrentUnit.AMPS)>maxCurrent)
+                    if(lift.getCurrent(CurrentUnit.AMPS)>maxCurrent)
                     {
-                        maxCurrent=robot.lift.getCurrent(CurrentUnit.AMPS);
+                        maxCurrent= lift.getCurrent(CurrentUnit.AMPS);
 
                     }
 
-                    if(robot.lift.getCurrent(CurrentUnit.AMPS)>3)
+                    if(maxCurrent>3)
                     {
                         currentExceeded=true;
                     }
                 }
-                robot.lift.setPower(0);
-                if(currentExceeded && robot.lift.getCurrentPosition()>50)
+                lift.setPower(0);
+                if(currentExceeded && lift.getCurrentPosition()>50)
                 {
-                    encoderDrive(1,robot.lift.getCurrentPosition()+300,3);
+                    encoderDrive(1, lift.getCurrentPosition()+300,3);
                 }
 
             }
             // Stop all motion;
-            robot.lift.setPower(0);
+            lift.setPower(0);
 
             // Turn off RUN_TO_POSITION
-            robot.lift.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
+            lift.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
 
+            //Reset Maximum current value
+            maxCurrent=0;
         }
 
     }
 
-    public void encoderDrive(double speed,
-                             int encoderValue,
-                             double timeoutS, boolean checkControls) {
+    public static void encoderDrive(double speed,
+                                    int encoderValue,
+                                    double timeoutS, boolean checkControls) {
 
         //(robot.lift_check.getDistance(DistanceUnit.INCH)>= 0)
 
         // Ensure that the opmode is still active
         if (curOpMode.opModeIsActive()) {
 
-            robot.lift.setTargetPosition(encoderValue);
-            int currentPosition = robot.lift.getCurrentPosition();
+            lift.setTargetPosition(encoderValue);
+            int currentPosition = lift.getCurrentPosition();
 
             // Turn On RUN_TO_POSITION
-            robot.lift.setMode(DcMotor.RunMode.RUN_TO_POSITION);
+            lift.setMode(DcMotor.RunMode.RUN_TO_POSITION);
 
 
             // reset the timeout time and start motion.
             runtime.reset();
-            robot.lift.setPower(speed);
+            lift.setPower(speed);
 
             // keep looping while we are still active, and there is time left, and both motors are running.
             // Note: We use (isBusy() && isBusy()) in the loop test, which means that when EITHER motor hits
@@ -451,16 +529,15 @@ public class LiftClawCommon {
             if (encoderValue > currentPosition) {  // if going up, no need to check
                 while (curOpMode.opModeIsActive() &&
                         (runtime.seconds() < timeoutS) &&
-                        robot.lift.isBusy()) {
+                        lift.isBusy()) {
 
                     if(checkControls) {
                         // Display it for the driver.
                         checkDriverControls();
                     }
-                    curOpMode.telemetry.addData("Path2", "Running at %7d",
-                            robot.lift.getCurrentPosition()
-                    );
-                    curOpMode.telemetry.update();
+
+
+
                 }
             }
             else
@@ -468,23 +545,20 @@ public class LiftClawCommon {
 
                 while (curOpMode.opModeIsActive() &&
                         (runtime.seconds() < timeoutS) &&
-                        robot.lift.isBusy()) {
+                        lift.isBusy()) {
 
                     // Display it for the driver.
                     checkDriverControls();
-                    curOpMode.telemetry.addData("Path2", "Running at %7d",
-                            robot.lift.getCurrentPosition()
-                    );
-                    curOpMode.telemetry.update();
+
                 }
 
 
             }
             // Stop all motion;
-            robot.lift.setPower(0);
+            lift.setPower(0);
 
             // Turn off RUN_TO_POSITION
-            robot.lift.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
+            lift.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
 
         }
 
@@ -507,38 +581,35 @@ public class LiftClawCommon {
         // Ensure that the opmode is still active
         if (curOpMode.opModeIsActive()) {
 
-            robot.lift.setTargetPosition(encoderValue);
-            int currentPosition = robot.lift.getCurrentPosition();
+            lift.setTargetPosition(encoderValue);
+            int currentPosition = lift.getCurrentPosition();
 
             // Turn On RUN_TO_POSITION
-            robot.lift.setMode(DcMotor.RunMode.RUN_TO_POSITION);
+            lift.setMode(DcMotor.RunMode.RUN_TO_POSITION);
 
 
             // reset the timeout time and start motion.
             runtime.reset();
-            robot.lift.setPower(speed);
+            lift.setPower(speed);
 
             if (encoderValue > currentPosition) {  // if going up, no need to check
                 while (curOpMode.opModeIsActive() &&
                         (runtime.seconds() < timeoutS) &&
-                        robot.lift.isBusy()) {
+                        lift.isBusy()) {
 
                     // Display it for the driver.
-                    robot.lift.setPower(speed);
-                    curOpMode.telemetry.addData("Path2", "Running at %7d",
-                            robot.lift.getCurrentPosition()
-                    );
-                    curOpMode.telemetry.update();
+                    lift.setPower(speed);
+
 
                     checkDriverControls();
                 }
             }
 
             if(lift_position==0) {
-                robot.lift.setPower(0);
+                lift.setPower(0);
 
                 // Turn off RUN_TO_POSITION
-                robot.lift.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
+                lift.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
             }
             //robot.lift.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
         }

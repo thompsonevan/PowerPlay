@@ -1,5 +1,9 @@
 package org.firstinspires.ftc.teamcode.autons;
 
+import static org.firstinspires.ftc.teamcode.lift.LiftClawCommon.closeClaw;
+import static org.firstinspires.ftc.teamcode.lift.LiftClawCommon.goToPos;
+import static org.firstinspires.ftc.teamcode.lift.LiftClawCommon.openClaw;
+
 import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.util.ElapsedTime;
@@ -40,11 +44,11 @@ public class RightMedium extends LinearOpMode {
 
         auto.resetEncoders();
 
-        auto.lift.closeClaw();
+        closeClaw();
 
         sleep(1000);
 
-        auto.lift.goToPos(liftSpeed, 1, 10);
+        goToPos(liftSpeed, 1, 10);
 
         auto.encoderStrafe(strafeSpeed, 10, 1150, true, false, false);
 
@@ -52,7 +56,7 @@ public class RightMedium extends LinearOpMode {
 
         auto.encoderDrive(driveSpeed, 1300, 10, false);
 
-        auto.lift.goToPos(liftSpeed, 3, 10);
+        goToPos(liftSpeed, 3, 10);
 
 
         boolean done = false;
@@ -72,13 +76,13 @@ public class RightMedium extends LinearOpMode {
             if (isIn) {
                 sleep(100);
 
-                auto.lift.openClaw();
+                openClaw();
 
                 sleep(100);
 
                 auto.encoderDrive(driveSpeed, -400, 10, false);
 
-                auto.lift.goToPos(liftSpeed, 0, 10);
+                goToPos(liftSpeed, 0, 10);
 
                 auto.driveToEnd(strafeSpeed, pos, false, true);
 

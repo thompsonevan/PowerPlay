@@ -1,6 +1,8 @@
 
 package org.firstinspires.ftc.teamcode.lift;
 
+import static org.firstinspires.ftc.teamcode.Robot.hwMap;
+
 import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.DcMotorEx;
 import com.qualcomm.robotcore.hardware.DcMotorSimple;
@@ -14,38 +16,30 @@ import com.qualcomm.robotcore.hardware.configuration.typecontainers.MotorConfigu
 import com.qualcomm.robotcore.util.ElapsedTime;
 
 
-public class LiftClawHardware
+public final class LiftClawHardware
 {
     /* Public OpMode members. */
 
-    public DcMotorEx  lift  = null;
-    public Servo    claw   = null;
-    public CRServo leftIntake;
-    public CRServo rightIntake;
+    public static DcMotorEx  lift  = null;
+    public static Servo    claw   = null;
+    public static CRServo leftIntake;
+    public static CRServo rightIntake;
 
     public static final double MID_SERVO       =  0.3 ;
 
     /* local OpMode members. */
-    HardwareMap hwMap           =  null;
+    //HardwareMap hwMap           =  null;
     private ElapsedTime period  = new ElapsedTime();
 
-    /* Constructor */
-    public LiftClawHardware(){
-
-    }
-
     /* Initialize standard Hardware interfaces */
-    public void init(HardwareMap ahwMap) {
+    static void initLiftClawHardware() {
         // Save reference to Hardware map
-        hwMap = ahwMap;
+
 
         // Define and Initialize Motors
 
         lift = (DcMotorEx) hwMap.get(DcMotor.class, "lift");
-        leftIntake = hwMap.get(CRServo.class, "leftIntake");
-        rightIntake = hwMap.get(CRServo.class, "rightIntake");
-        //rightIntake.setDirection(DcMotor.Direction.REVERSE);
-        leftIntake.setDirection(DcMotor.Direction.REVERSE);
+
 
         lift.setDirection(DcMotor.Direction.REVERSE);// Set to FORWARD if using AndyMark motors
 
