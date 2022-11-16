@@ -4,6 +4,8 @@ import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.util.ElapsedTime;
 
+import org.firstinspires.ftc.teamcode.Robot;
+
 @Autonomous(name="Base", group="OnBot")
 
 public class BasePath extends LinearOpMode {
@@ -19,6 +21,8 @@ public class BasePath extends LinearOpMode {
     @Override
     public void runOpMode() {
         auto = new AutoCommon(this, red);
+
+        Robot.init(true,true,false,this);
 
         auto.resetEncoders();
 

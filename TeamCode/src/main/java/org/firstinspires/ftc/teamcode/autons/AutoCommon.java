@@ -42,8 +42,8 @@ public class AutoCommon {
 
         curOpMode = owningOpMode;
 
-        DrivetrainCommon_ALT1.initDrivetrainCommon_ALT1();
-        LiftClawCommon.initLiftClawCommon();
+//        DrivetrainCommon_ALT1.initDrivetrainCommon_ALT1();
+//        LiftClawCommon.initLiftClawCommon();
 //        drivetrain = new DrivetrainCommon_ALT1(curOpMode);
 
     }

@@ -7,6 +7,8 @@ import static org.firstinspires.ftc.teamcode.lift.LiftClawCommon.openClaw;
 import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.util.ElapsedTime;
+
+import org.firstinspires.ftc.teamcode.Robot;
 import org.firstinspires.ftc.teamcode.vision.Vision;
 
 
@@ -37,6 +39,8 @@ public class RightHigh extends LinearOpMode {
     @Override
     public void runOpMode() {
         auto = new AutoCommon(this, red);
+
+        Robot.init(true,true,false,this);
 
         Vision camera = new Vision();
         camera.start(hardwareMap);

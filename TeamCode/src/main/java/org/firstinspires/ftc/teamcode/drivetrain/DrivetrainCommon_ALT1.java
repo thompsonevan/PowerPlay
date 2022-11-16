@@ -91,7 +91,7 @@ public final class DrivetrainCommon_ALT1 {
 
     //Variables for refining responsiveness of joystick controls
     static double powerShift = 0;
-    static double expVal = 3;
+    static double expVal = 5;
 
     static boolean isPickupDropGood = false;
     static boolean isLiftUp = false;
@@ -115,8 +115,8 @@ public final class DrivetrainCommon_ALT1 {
 
     static boolean rampDrive;
     static boolean rampStrafe;
-    static int rampInterval=25;
-    static double rampIncrement=.01;
+    static int rampInterval=10;
+    static double rampIncrement=.05;
     static double rampTargetDriveSpeed = 0;
     static double rampTargetStrafeSpeed=0;
     static ElapsedTime rampRuntime= new ElapsedTime();
@@ -461,13 +461,14 @@ public final class DrivetrainCommon_ALT1 {
         }
     public static void executeDrive(double strafeVal, double driveVal) {
     //Drive forward
-        //  double driveVal;
-       //   double strafeVal;
+        /**double driveVal;
+        double strafeVal;
 
 
-       /**    if(Math.abs(inDriveVal)>.1 && (Math.abs(rampTargetDriveSpeed)<=Math.abs(inDriveVal))) {
+          if(Math.abs(inDriveVal)>.1 && (Math.abs(rampTargetDriveSpeed)<=Math.abs(inDriveVal))) {
 
-               if(rampRuntime.milliseconds()>rampInterval) {
+               //if(rampRuntime.milliseconds()>rampInterval)
+               {
                    rampTargetDriveSpeed = Math.signum(inDriveVal)*(Math.abs(rampTargetDriveSpeed) + rampIncrement);
                    rampRuntime.reset();
                }
@@ -476,33 +477,35 @@ public final class DrivetrainCommon_ALT1 {
                driveVal=rampTargetDriveSpeed;
 
            }
-           else if(Math.abs(rampTargetDriveSpeed)>=Math.abs(inDriveVal))
+           else if(Math.abs(inDriveVal)>0 && Math.abs(rampTargetDriveSpeed)>=Math.abs(inDriveVal))
            {
                driveVal=rampTargetDriveSpeed;
 
            }
            else
            {
-               rampTargetDriveSpeed=0.1;
+               rampTargetDriveSpeed=.1;
                driveVal=inDriveVal;
            }
 
            if(Math.abs(inStrafeVal) >.1 && Math.abs(rampTargetStrafeSpeed)<=Math.abs(inStrafeVal))
            {
-               if(rampRuntime.milliseconds()>rampInterval)
+
+               correction=0;
+               //if(rampRuntime.milliseconds()>rampInterval)
                {
                    rampTargetStrafeSpeed=Math.signum(inStrafeVal)*(Math.abs(rampTargetStrafeSpeed)+rampIncrement);
                    rampRuntime.reset();
                }
                strafeVal=rampTargetStrafeSpeed;
            }
-           else if(Math.abs(rampTargetStrafeSpeed)>=Math.abs(inStrafeVal))
+           else if(Math.abs(inStrafeVal)>0 && Math.abs(rampTargetStrafeSpeed)>=Math.abs(inStrafeVal))
            {
                strafeVal=rampTargetStrafeSpeed;
            }
            else
            {
-               rampTargetStrafeSpeed=0.1;
+               rampTargetStrafeSpeed=.1;
                strafeVal=inStrafeVal;
            }**/
 
