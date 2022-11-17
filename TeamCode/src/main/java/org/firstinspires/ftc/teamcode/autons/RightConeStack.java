@@ -37,7 +37,7 @@ public class RightConeStack extends LinearOpMode {
     int pos = 2;
 
     @Override
-    public void runOpMode() {
+    public void runOpMode() throws InterruptedException {
         //auto = new AutoCommon(this, red);
 
         Robot.init(true, true, false, true, true, this);
@@ -65,6 +65,8 @@ public class RightConeStack extends LinearOpMode {
         AutoCommon.encoderDrive(driveSpeed, -200, 10, false);
 
         AutoCommon.encoderDrive(driveSpeed, 1225, 10, false);
+
+        AutoCommon.autoDropConeOnJunction(5);
 
 
         goToPos(liftSpeed, 0, 10);
