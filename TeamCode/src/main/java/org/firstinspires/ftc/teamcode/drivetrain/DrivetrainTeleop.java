@@ -17,7 +17,7 @@ public class DrivetrainTeleop extends LinearOpMode {
     @Override
     public void runOpMode() {
 
-        Robot.init(true,false, false,this);
+        Robot.init(true,false, false,true,false,this);
         waitForStart();
 
         while (opModeIsActive()) {

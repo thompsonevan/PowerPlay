@@ -7,6 +7,7 @@ import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 
 import org.firstinspires.ftc.teamcode.drivetrain.DrivetrainCommon_ALT1;
+import org.firstinspires.ftc.teamcode.drivetrain.DrivetrainHardware;
 import org.firstinspires.ftc.teamcode.lift.LiftClawCommon;
 
 @TeleOp(name="TeleOp", group="Pushbot")
@@ -18,7 +19,10 @@ public class TeleopAll extends LinearOpMode {
     public void runOpMode() {
 
         Robot.DrivetrainLoopState = Robot.LoopStates.Completed;
-        Robot.init(true,true,false,this);
+        Robot.init(true,true,false,true,true,this);
+
+
+
         waitForStart();
 
         while (opModeIsActive()) {
@@ -30,6 +34,11 @@ public class TeleopAll extends LinearOpMode {
 
             executeLiftClawTeleop();
 
+
+            Robot.curOpMode.telemetry.addData("LF:",DrivetrainHardware.driveLF.getCurrentPosition());
+            Robot.curOpMode.telemetry.addData("RF:",DrivetrainHardware.driveRF.getCurrentPosition());
+            Robot.curOpMode.telemetry.addData("LR:",DrivetrainHardware.driveLR.getCurrentPosition());
+            Robot.curOpMode.telemetry.addData("RR:",DrivetrainHardware.driveRR.getCurrentPosition());
             Robot.curOpMode.telemetry.update();
         }
     }

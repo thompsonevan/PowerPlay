@@ -4,21 +4,14 @@ package org.firstinspires.ftc.teamcode.drivetrain;
 import static org.firstinspires.ftc.teamcode.Robot.DrivetrainLoopState;
 import static org.firstinspires.ftc.teamcode.Robot.curOpMode;
 import static org.firstinspires.ftc.teamcode.Robot.driver;
-import static org.firstinspires.ftc.teamcode.drivetrain.DrivetrainHardware.centerCheck;
 import static org.firstinspires.ftc.teamcode.drivetrain.DrivetrainHardware.driveLF;
 import static org.firstinspires.ftc.teamcode.drivetrain.DrivetrainHardware.driveLR;
 import static org.firstinspires.ftc.teamcode.drivetrain.DrivetrainHardware.driveRF;
 import static org.firstinspires.ftc.teamcode.drivetrain.DrivetrainHardware.driveRR;
-import static org.firstinspires.ftc.teamcode.drivetrain.DrivetrainHardware.greenLed;
-import static org.firstinspires.ftc.teamcode.drivetrain.DrivetrainHardware.greenLed2;
 
 import static org.firstinspires.ftc.teamcode.drivetrain.DrivetrainHardware.imu;
-import static org.firstinspires.ftc.teamcode.drivetrain.DrivetrainHardware.junctionDriveDirCheck;
-import static org.firstinspires.ftc.teamcode.drivetrain.DrivetrainHardware.leftConeCheck;
-import static org.firstinspires.ftc.teamcode.drivetrain.DrivetrainHardware.redLed;
-import static org.firstinspires.ftc.teamcode.drivetrain.DrivetrainHardware.redLed2;
 
-import static org.firstinspires.ftc.teamcode.drivetrain.DrivetrainHardware.rightConeCheck;
+
 
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.hardware.DcMotor;
@@ -32,15 +25,18 @@ import org.firstinspires.ftc.robotcore.external.navigation.AxesReference;
 import org.firstinspires.ftc.robotcore.external.navigation.DistanceUnit;
 import org.firstinspires.ftc.robotcore.external.navigation.Orientation;
 import org.firstinspires.ftc.teamcode.PIDController;
+import org.firstinspires.ftc.teamcode.autons.AutoCommon;
 import org.firstinspires.ftc.teamcode.lift.LiftClawCommon;
 import org.firstinspires.ftc.teamcode.Robot;
+import org.firstinspires.ftc.teamcode.sensors.SensorsHardware;
+
 import java.util.Locale;
 
 public final class DrivetrainCommon_ALT1 {
 
     private double servoValue = 0;
 
-    static Orientation angles;
+    public static Orientation angles;
 
     static int primaryHeading = 0;
 
@@ -95,7 +91,7 @@ public final class DrivetrainCommon_ALT1 {
 
     static boolean isPickupDropGood = false;
     static boolean isLiftUp = false;
-    static boolean autoPickDropEnabled = false;
+
     static boolean startAutoPickDrop;
     static boolean atPickupLocation=false;
     static boolean autoRight = false;
@@ -107,9 +103,7 @@ public final class DrivetrainCommon_ALT1 {
     double foreMin;
     double aftMin;
 
-    static double leftVal;
-    static double rightVal;
-    static double centerVal;
+
     double foreVal;
     double aftVal;
 
@@ -123,7 +117,7 @@ public final class DrivetrainCommon_ALT1 {
 
     static boolean autoSequenceRunning=false;
 
-    static double correction = 0;
+    public static double correction = 0;
     static double leftTurnCorrection = 0;
     static double rightTurnCorrection = 0;
 
@@ -184,21 +178,21 @@ public final class DrivetrainCommon_ALT1 {
 
         if(driver.x)
         {
-            turnToAngle(-90);
+            AutoCommon.turnToAngleAuton(-90);
             primaryHeading=-90;
         }
         if(driver.b) {
-            turnToAngle(90);
+            AutoCommon.turnToAngleAuton(90);
             primaryHeading=90;
         }
         if(driver.a)
         {
-            turnToAngle(0);
+            AutoCommon.turnToAngleAuton(0);
             primaryHeading=0;
         }
         if(driver.y)
         {
-            turnToAngle(180);
+            AutoCommon.turnToAngleAuton(180);
             primaryHeading=180;
         }
 
@@ -330,30 +324,16 @@ public final class DrivetrainCommon_ALT1 {
                 xVal = slowPower;
             }
 
-            if (isLiftUp) {
-
-            } else {
-                if(!autoSequenceRunning) {
-                    isPickupDropGood = checkCones();
-                }
-            }
-
-            if (curOpMode.gamepad2.right_stick_button && autoPickDropEnabled && !autoSequenceRunning ) {
+            if (curOpMode.gamepad2.right_stick_button && AutoCommon.autoPickDropEnabled && !autoSequenceRunning ) {
                 autoSequenceRunning=true;
-                if (startAutoPickDrop) {
-                    leftMax = leftVal;
-                    rightMax = rightVal;
-                    centerMin = centerVal;
-
-                }
-                autoPickDrop();
+                AutoCommon.autoPickDropAuton(true);
                 autoSequenceRunning=false;
+                AutoCommon.autoPickDropEnabled=false;
             }
-            else {
-                autoLeft = false;
-                autoRight = false;
-                startAutoPickDrop = true;
-                atPickupLocation=false;
+            else if(curOpMode.gamepad2.right_stick_button)
+            {
+                AutoCommon.autoPickDropEnabled=false;
+                AutoCommon.checkConesAuton();
             }
 
             if(!autoSequenceRunning) {
@@ -603,7 +583,7 @@ public final class DrivetrainCommon_ALT1 {
             //printData();
     }
 
-    public static void autoPickDrop()
+ /**   public static void autoPickDrop()
     {
 
         LiftClawCommon.reduceConeStackCount();
@@ -684,9 +664,9 @@ public final class DrivetrainCommon_ALT1 {
     }
     public static boolean checkCones() {
 
-        leftVal = leftConeCheck.getDistance(DistanceUnit.INCH);
-        rightVal = rightConeCheck.getDistance(DistanceUnit.INCH);
-        centerVal = centerCheck.getDistance(DistanceUnit.INCH);
+        leftVal = SensorsHardware.leftConeCheck.getDistance(DistanceUnit.INCH);
+        rightVal = SensorsHardware.rightConeCheck.getDistance(DistanceUnit.INCH);
+        centerVal = SensorsHardware.centerCheck.getDistance(DistanceUnit.INCH);
 
         boolean clear = false;
 
@@ -697,11 +677,11 @@ public final class DrivetrainCommon_ALT1 {
                 (((centerVal+1.5)<rightVal)  && ((centerVal+1.5)<leftVal)) )
                 && centerVal<distanceThreshold)
         {
-            greenLed.setState(true);
-            redLed.setState(false);
+            SensorsHardware.greenLed.setState(true);
+            SensorsHardware.redLed.setState(false);
 
-            greenLed2.setState(true);
-            redLed2.setState(false);
+            SensorsHardware.greenLed2.setState(true);
+            SensorsHardware.redLed2.setState(false);
 
 
 
@@ -715,22 +695,22 @@ public final class DrivetrainCommon_ALT1 {
             //need to shift left
             if(leftVal<rightVal) {
 
-                greenLed.setState(false);
-                redLed.setState(true);
+                SensorsHardware.greenLed.setState(false);
+                SensorsHardware.redLed.setState(true);
 
 
-                greenLed2.setState(true);
-                redLed2.setState(false);
+                SensorsHardware.greenLed2.setState(true);
+                SensorsHardware.redLed2.setState(false);
 
             }
             //need to shift right
             else if(leftVal>rightVal)
             {
-                greenLed.setState(true);
-                redLed.setState(false);
+                SensorsHardware.greenLed.setState(true);
+                SensorsHardware.redLed.setState(false);
 
-                greenLed2.setState(false);
-                redLed2.setState(true);
+                SensorsHardware.greenLed2.setState(false);
+                SensorsHardware.redLed2.setState(true);
 
             }
             autoPickDropEnabled=true;
@@ -738,11 +718,11 @@ public final class DrivetrainCommon_ALT1 {
         }
         else if((centerVal<distanceThreshold) && (centerVal<leftVal) && centerVal<rightVal)
         {
-            greenLed.setState(true);
-            redLed.setState(false);
+            SensorsHardware.greenLed.setState(true);
+            SensorsHardware.redLed.setState(false);
 
-            greenLed2.setState(true);
-            redLed2.setState(false);
+            SensorsHardware.greenLed2.setState(true);
+            SensorsHardware.redLed2.setState(false);
 
             clear = true;
             autoPickDropEnabled=true;
@@ -751,11 +731,11 @@ public final class DrivetrainCommon_ALT1 {
         {
 
             autoPickDropEnabled=false;
-            greenLed.setState(false);
-            redLed.setState(false);
+            SensorsHardware.greenLed.setState(false);
+            SensorsHardware.redLed.setState(false);
 
-            greenLed2.setState(false);
-            redLed2.setState(false);
+            SensorsHardware.greenLed2.setState(false);
+            SensorsHardware.redLed2.setState(false);
         }
 
         curOpMode.telemetry.addData("leftCheck:",leftVal);
@@ -828,7 +808,7 @@ public final class DrivetrainCommon_ALT1 {
         driveRF.setPower(0);
         driveRR.setPower(0);
 
-    }
+    }**/
 
     /**
      * Resets the cumulative angle tracking to zero.

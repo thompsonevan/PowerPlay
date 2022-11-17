@@ -20,25 +20,25 @@ public class BasePath extends LinearOpMode {
 
     @Override
     public void runOpMode() {
-        auto = new AutoCommon(this, red);
+        
 
-        Robot.init(true,true,false,this);
+        Robot.init(true,true,false,true,true,this);
 
-        auto.resetEncoders();
+        AutoCommon.resetEncoders();
 
-        auto.encoderDrive(driveSpeed, 1200, 10, false);
+        AutoCommon.encoderDrive(driveSpeed, 1200, 10, false);
 
-        auto.encoderTurn(.5, -00, 10);
+        AutoCommon.encoderTurn(.5, -00, 10);
 
-        auto.encoderStrafe(strafeSpeed, 10, 1200, true, false, false);
+        AutoCommon.encoderStrafe(strafeSpeed, 10, 1200, true, false, false);
 
-        auto.encoderDrive(driveSpeed, 1000, 10, false);
+        AutoCommon.encoderDrive(driveSpeed, 1000, 10, false);
 
-        auto.encoderTurn(.5, 775, 10);
+        AutoCommon.encoderTurn(.5, 775, 10);
 
-        auto.encoderDrive(driveSpeed, 1100, 10, false);
+        AutoCommon.encoderDrive(driveSpeed, 1100, 10, false);
 
-        auto.encoderStrafe(strafeSpeed, 10, 2500, true, false, false);
+        AutoCommon.encoderStrafe(strafeSpeed, 10, 2500, true, false, false);
 
     }
 }

@@ -32,9 +32,8 @@ public class RightLow extends LinearOpMode {
 
     @Override
     public void runOpMode() {
-        auto = new AutoCommon(this, red);
-
-        Robot.init(true,true,false,this);
+     
+        Robot.init(true,true,false,true,true,this);
 
         Vision camera = new Vision();
         camera.start(hardwareMap);
@@ -43,27 +42,27 @@ public class RightLow extends LinearOpMode {
             pos = camera.getPos();
         }
 
-        auto.resetEncoders();
+        AutoCommon.resetEncoders();
 
         closeClaw();
 
         goToPos(liftSpeed, 1, 10);
 
-        auto.encoderDrive(driveSpeed, 250, 10, false);
+        AutoCommon.encoderDrive(driveSpeed, 250, 10, false);
 
         goToPos(liftSpeed, 2, 10);
 
         boolean done = false;
 
         while (!done) {
-            done = auto.scanForPole(false);
+            done = AutoCommon.scanForPole(false);
         }
 
         if (done) {
             boolean isIn = false;
 
             while (!isIn) {
-                isIn = auto.driveIntoPole();
+                isIn = AutoCommon.driveIntoPole();
             }
 
             if (isIn) {
@@ -73,11 +72,11 @@ public class RightLow extends LinearOpMode {
 
                 sleep(100);
 
-                auto.encoderDrive(driveSpeed, -200, 10, false);
+                AutoCommon.encoderDrive(driveSpeed, -200, 10, false);
 
                 goToPos(liftSpeed, 0, 10);
 
-                auto.driveToEnd(strafeSpeed, pos, false, true);
+                AutoCommon.driveToEnd(strafeSpeed, pos, false, true);
             }
         }
     }

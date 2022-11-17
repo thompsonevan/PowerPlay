@@ -1,7 +1,6 @@
 package org.firstinspires.ftc.teamcode.lift;
 import static org.firstinspires.ftc.teamcode.Robot.DrivetrainLoopState;
 import static org.firstinspires.ftc.teamcode.Robot.curOpMode;
-import static org.firstinspires.ftc.teamcode.Robot.liftClaw;
 import static org.firstinspires.ftc.teamcode.Robot.operator;
 import static org.firstinspires.ftc.teamcode.drivetrain.DrivetrainCommon_ALT1.executeDrivetrainTeleop;
 import static org.firstinspires.ftc.teamcode.lift.LiftClawHardware.claw;
@@ -78,12 +77,13 @@ import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import org.firstinspires.ftc.robotcore.external.navigation.CurrentUnit;
 import org.firstinspires.ftc.teamcode.drivetrain.DrivetrainCommon_ALT1;
 import org.firstinspires.ftc.teamcode.drivetrain.DrivetrainHardware;
+import org.firstinspires.ftc.teamcode.sensors.SensorsCommon;
+import org.firstinspires.ftc.teamcode.sensors.SensorsHardware;
 //import org.firstinspires.ftc.teamcode.drivetrain.DrivetrainCommon_ALT1;
 
 public final class LiftClawCommon {
 
-    static boolean xPressed = false;
-    static boolean yPressed = false;
+
     private static int lift_position;
     private static final double DEFAULT_LIFT_SPEED = 0.5;
 
@@ -92,11 +92,15 @@ public final class LiftClawCommon {
     public static int pos = 5;
     static int lengthOfPos;
 
+    static int buttonPressCount=0;
+
     int rightPos =0;
     int leftPos=0;
     static double maxCurrent=0;
     private static ElapsedTime     runtime = new ElapsedTime();
 
+    static ElapsedTime yButtonElapsed = new ElapsedTime();
+    static ElapsedTime xButtonElapsed = new ElapsedTime();
     static Map<Integer,Integer> LIFT_POSITIONS = new HashMap<>();
     static Map<Integer,Integer> STACK_POSITIONS = new HashMap<>();
 
@@ -195,43 +199,34 @@ public final class LiftClawCommon {
             lift.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
         }
 
-        if(operator.y && !yPressed){
-            yPressed=true;
-            //TODO:  ADD LED UPDATES
+        if(operator.y && yButtonElapsed.milliseconds()>250){
+
            increaseConeStackCount();
-        }
-        else
-        {
-            yPressed=false;
+           yButtonElapsed.reset();
         }
 
-        if(operator.x && !xPressed){
+        if(operator.x && xButtonElapsed.milliseconds()>250){
 
-            xPressed=true;
-          //TODO: ADD LED UPDATES
             reduceConeStackCount();
-        }
-        else
-        {
-            xPressed=false;
+            xButtonElapsed.reset();
         }
 
         if(operator.b)
         {
-            //TODO: ADD LED UPDATES
+
             pos=5;
 
-            DrivetrainHardware.redLedC1.setState(false);
-            DrivetrainHardware.redLedC2.setState(false);
-            DrivetrainHardware.redLedC3.setState(false);
-            DrivetrainHardware.redLedC4.setState(false);
-            DrivetrainHardware.redLedC5.setState(false);
+            SensorsHardware.redLedC1.setState(false);
+            SensorsHardware.redLedC2.setState(false);
+            SensorsHardware.redLedC3.setState(false);
+            SensorsHardware.redLedC4.setState(false);
+            SensorsHardware.redLedC5.setState(false);
 
-            DrivetrainHardware.greenLedC1.setState(true);
-            DrivetrainHardware.greenLedC2.setState(true);
-            DrivetrainHardware.greenLedC3.setState(true);
-            DrivetrainHardware.greenLedC4.setState(true);
-            DrivetrainHardware.greenLedC5.setState(true);
+            SensorsHardware.greenLedC1.setState(true);
+            SensorsHardware.greenLedC2.setState(true);
+            SensorsHardware.greenLedC3.setState(true);
+            SensorsHardware.greenLedC4.setState(true);
+            SensorsHardware.greenLedC5.setState(true);
 
         }
 
@@ -284,34 +279,34 @@ public final class LiftClawCommon {
         {
             case 4:
             {
-                DrivetrainHardware.greenLedC5.setState(false);
-                DrivetrainHardware.redLedC5.setState(true);
+                SensorsHardware.greenLedC5.setState(false);
+                SensorsHardware.redLedC5.setState(true);
                 break;
             }
             case 3:
             {
-                DrivetrainHardware.greenLedC4.setState(false);
-                DrivetrainHardware.redLedC4.setState(true);
+                SensorsHardware.greenLedC4.setState(false);
+                SensorsHardware.redLedC4.setState(true);
                 break;
             }
 
             case 2:
             {
-                DrivetrainHardware.greenLedC3.setState(false);
-                DrivetrainHardware.redLedC3.setState(true);
+                SensorsHardware.greenLedC3.setState(false);
+                SensorsHardware.redLedC3.setState(true);
                 break;
             }
 
             case 1:
             {
-                DrivetrainHardware.greenLedC2.setState(false);
-                DrivetrainHardware.redLedC2.setState(true);
+                SensorsHardware.greenLedC2.setState(false);
+                SensorsHardware.redLedC2.setState(true);
                 break;
             }
             case 0:
             {
-                DrivetrainHardware.greenLedC1.setState(false);
-                DrivetrainHardware.redLedC1.setState(true);
+                SensorsHardware.greenLedC1.setState(false);
+                SensorsHardware.redLedC1.setState(true);
                 break;
             }
         }
@@ -326,34 +321,34 @@ public final class LiftClawCommon {
         {
             case 5:
             {
-                DrivetrainHardware.greenLedC5.setState(true);
-                DrivetrainHardware.redLedC5.setState(false);
+                SensorsHardware.greenLedC5.setState(true);
+                SensorsHardware.redLedC5.setState(false);
                 break;
             }
             case 4:
             {
-                DrivetrainHardware.greenLedC4.setState(true);
-                DrivetrainHardware.redLedC4.setState(false);
+                SensorsHardware.greenLedC4.setState(true);
+                SensorsHardware.redLedC4.setState(false);
                 break;
             }
 
             case 3:
             {
-                DrivetrainHardware.greenLedC3.setState(true);
-                DrivetrainHardware.redLedC3.setState(false);
+                SensorsHardware.greenLedC3.setState(true);
+                SensorsHardware.redLedC3.setState(false);
                 break;
             }
 
             case 2:
             {
-                DrivetrainHardware.greenLedC2.setState(true);
-                DrivetrainHardware.redLedC2.setState(false);
+                SensorsHardware.greenLedC2.setState(true);
+                SensorsHardware.redLedC2.setState(false);
                 break;
             }
             case 1:
             {
-                DrivetrainHardware.greenLedC1.setState(true);
-                DrivetrainHardware.redLedC1.setState(false);
+                SensorsHardware.greenLedC1.setState(true);
+                SensorsHardware.redLedC1.setState(false);
                 break;
             }
         }

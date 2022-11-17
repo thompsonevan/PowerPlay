@@ -21,9 +21,9 @@ import org.firstinspires.ftc.teamcode.vision.Vision;
     4 - High
  */
 
-@Autonomous(name="Right High", group="OnBot")
+@Autonomous(name="Right Cone Stack", group="OnBot")
 
-public class RightHigh extends LinearOpMode {
+public class RightConeStack extends LinearOpMode {
     private ElapsedTime     runtime = new ElapsedTime();
 
     AutoCommon auto=null;
@@ -38,13 +38,14 @@ public class RightHigh extends LinearOpMode {
 
     @Override
     public void runOpMode() {
-      
-        Robot.init(true,true,false,true,true,this);
+        //auto = new AutoCommon(this, red);
+
+        Robot.init(true, true, false, true, true, this);
 
         Vision camera = new Vision();
         camera.start(hardwareMap);
 
-        while(!isStarted()){
+        while (!isStarted()) {
             pos = camera.getPos();
         }
 
@@ -63,40 +64,14 @@ public class RightHigh extends LinearOpMode {
 
         AutoCommon.encoderDrive(driveSpeed, -200, 10, false);
 
-        AutoCommon.encoderDrive(driveSpeed,1225, 10, false);
+        AutoCommon.encoderDrive(driveSpeed, 1225, 10, false);
 
-        goToPos(liftSpeed, 4, 10);
 
-        boolean done = false;
+        goToPos(liftSpeed, 0, 10);
 
-        while(!done){
-            done = AutoCommon.scanForPole(false);
-            sleep(150);
-        }
+        AutoCommon.driveToEnd(strafeSpeed, pos, true, true);
 
-        if(done) {
+        AutoCommon.encoderTurn(.50, -1600, 10);
 
-            boolean isIn = false;
-
-            while (!isIn) {
-                isIn = AutoCommon.driveIntoPole();
-            }
-
-            if (isIn) {
-                sleep(100);
-
-                openClaw();
-
-                sleep(100);
-
-                AutoCommon.encoderDrive(driveSpeed, -300, 10, false);
-
-                goToPos(liftSpeed, 0, 10);
-
-                AutoCommon.driveToEnd(strafeSpeed, pos, true, true);
-
-                AutoCommon.encoderTurn(.50, -1600, 10);
-            }
-        }
     }
 }

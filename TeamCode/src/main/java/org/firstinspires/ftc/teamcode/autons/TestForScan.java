@@ -19,18 +19,17 @@ public class TestForScan extends LinearOpMode {
     @Override
     public void runOpMode() {
 
-        auto = new AutoCommon(this, red);
-
-        auto.resetEncoders();
+     
+        AutoCommon.resetEncoders();
 
         waitForStart();
 
-//        auto.isDone = false;
+//        AutoCommon.isDone = false;
 //
 //        sleep(1000);
 //
-//        auto.encoderStrafe(.2, 10, 750, false, false, false);
+//        AutoCommon.encoderStrafe(.2, 10, 750, false, false, false);
 //
-        while(!auto.scanForPole(true));
+        while(!AutoCommon.scanForPole(true));
     }
 }

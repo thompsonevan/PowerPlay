@@ -21,27 +21,26 @@ public class Robotboogie extends LinearOpMode {
 
     @Override
     public void runOpMode() {
-        auto = new AutoCommon(this, red);
+      
+        AutoCommon.resetEncoders();
 
-        auto.resetEncoders();
+        AutoCommon.encoderDrive(driveSpeed, 100, 10, false);
 
-        auto.encoderDrive(driveSpeed, 100, 10, false);
+        AutoCommon.encoderStrafe(strafeSpeed, 10, 1300, true, false, false);
 
-        auto.encoderStrafe(strafeSpeed, 10, 1300, true, false, false);
+        AutoCommon.encoderDrive(driveSpeed, 2700, 10, false);
 
-        auto.encoderDrive(driveSpeed, 2700, 10, false);
+        AutoCommon.encoderTurn(.25, 730, 10);
 
-        auto.encoderTurn(.25, 730, 10);
+        AutoCommon.encoderDrive(driveSpeed, 700, 10, false);
 
-        auto.encoderDrive(driveSpeed, 700, 10, false);
+        AutoCommon.encoderTurn(.5, 5000, 10);
 
-        auto.encoderTurn(.5, 5000, 10);
+        AutoCommon.encoderDrive(driveSpeed, 500, 10, false);
 
-        auto.encoderDrive(driveSpeed, 500, 10, false);
+        AutoCommon.encoderDrive(driveSpeed, -500, 10, false);
 
-        auto.encoderDrive(driveSpeed, -500, 10, false);
-
-        auto.encoderTurn(.5, 2000, 10);
+        AutoCommon.encoderTurn(.5, 2000, 10);
 
 
 

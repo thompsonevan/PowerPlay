@@ -40,9 +40,8 @@ public class LeftHigh extends LinearOpMode {
 
     @Override
     public void runOpMode() {
-        auto = new AutoCommon(this, red);
 
-        Robot.init(true,true,false,this);
+        Robot.init(true,true,false,true,true,this);
 
         Vision camera = new Vision();
         camera.start(hardwareMap);
@@ -54,7 +53,7 @@ public class LeftHigh extends LinearOpMode {
         telemetry.addData("pos", pos);
         telemetry.update();
 
-        auto.resetEncoders();
+        AutoCommon.resetEncoders();
 
         closeClaw();
 
@@ -62,18 +61,18 @@ public class LeftHigh extends LinearOpMode {
 
         goToPos(liftSpeed, 1, 10);
 
-        auto.encoderStrafe(strafeSpeed, 10, 1150, false, false, false);
+        AutoCommon.encoderStrafe(strafeSpeed, 10, 1150, false, false, false);
 
-        auto.encoderDrive(driveSpeed, -200, 10, false);
+        AutoCommon.encoderDrive(driveSpeed, -200, 10, false);
 
-        auto.encoderDrive(driveSpeed,1275, 10, false);
+        AutoCommon.encoderDrive(driveSpeed,1275, 10, false);
 
         goToPos(liftSpeed, 4, 10);
 
         boolean done = false;
 
         while(!done){
-            done = auto.scanForPole(true);
+            done = AutoCommon.scanForPole(true);
             sleep(150);
         }
 
@@ -82,7 +81,7 @@ public class LeftHigh extends LinearOpMode {
             boolean isIn = false;
 
             while (!isIn) {
-                isIn = auto.driveIntoPole();
+                isIn = AutoCommon.driveIntoPole();
             }
 
             if (isIn) {
@@ -92,13 +91,13 @@ public class LeftHigh extends LinearOpMode {
 
                 sleep(100);
 
-                auto.encoderDrive(driveSpeed, -300, 10, false);
+                AutoCommon.encoderDrive(driveSpeed, -300, 10, false);
 
                 goToPos(liftSpeed, 0, 10);
 
-                auto.driveToEnd(strafeSpeed, pos, true, false);
+                AutoCommon.driveToEnd(strafeSpeed, pos, true, false);
 
-                auto.encoderTurn(.50, -1600, 10);
+                AutoCommon.encoderTurn(.50, -1600, 10);
             }
         }
     }
