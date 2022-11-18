@@ -212,6 +212,10 @@ public final class AutoCommon {
         return autoOk;
     }
 
+    public static void distanceSensorFailure()
+    {
+
+    }
 
     public static void autoPickDropAuton(boolean teleOp)
     {
@@ -219,6 +223,14 @@ public final class AutoCommon {
         DrivetrainCommon_ALT1.correction=0;
 
         SensorsCommon.updateDistanceValues();
+
+        if(SensorsCommon.leftVal>300 || SensorsCommon.rightVal>300 || SensorsCommon.centerVal>300)
+        {
+
+
+            return;
+        }
+
         LiftClawCommon.reduceConeStackCount();
 
         LiftClawCommon.clearConeStack(false);
@@ -274,11 +286,12 @@ public final class AutoCommon {
 
         LiftClawCommon.clearConeStack(false);
 
-        while (continueAutoPick(teleOp))
-        {
+        if(teleOp) {
+            while (continueAutoPick(teleOp)) {
 
-            executeDrive(0, -autoDrivePower);
+                executeDrive(0, -autoDrivePower);
 
+            }
         }
     }
     public static boolean checkConesAuton() {
@@ -345,7 +358,7 @@ public final class AutoCommon {
         else
         {
 
-            autoPickDropEnabled=false;
+            //autoPickDropEnabled=false;
             SensorsHardware.greenLed.setState(false);
             SensorsHardware.redLed.setState(false);
 
@@ -972,6 +985,43 @@ public final class AutoCommon {
     static boolean isDone = false;
 
     public static boolean scanForPole(boolean goingRight){
+
+        SensorsCommon.updateDistanceValues();
+        //double right = leftConeCheck.getDistance(DistanceUnit.INCH);
+        //double left = rightConeCheck.getDistance(DistanceUnit.INCH);
+        //double center = centerCheck.getDistance(DistanceUnit.INCH);
+
+        if (goingRight) {
+            if (SensorsCommon.rightVal > 11.5 && !outerPassed) {
+                executeDrive(.1,0);
+            }
+            if (SensorsCommon.rightVal < 11.5) {
+                outerPassed = true;
+            }
+            if (SensorsCommon.rightVal > 11.5 && outerPassed) {
+                executeDrive(0,0);
+                isDone = true;
+//                outerPassed = false;
+            }
+        } else {
+            if (SensorsCommon.leftVal > 11.5 && !outerPassed) {
+                executeDrive(-.1,0);
+
+            }
+            if (SensorsCommon.leftVal < 11.5) {
+                outerPassed = true;
+            }
+            if (SensorsCommon.leftVal > 11.5 && outerPassed) {
+                executeDrive(0,0);
+                isDone = true;
+//                outerPassed = false;
+            }
+        }
+
+        return isDone;
+    }
+
+    public static boolean scanForPoleWithCenter(boolean goingRight){
 
         SensorsCommon.updateDistanceValues();
         //double right = leftConeCheck.getDistance(DistanceUnit.INCH);

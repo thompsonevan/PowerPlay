@@ -9,6 +9,7 @@ import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.util.ElapsedTime;
 
 import org.firstinspires.ftc.teamcode.Robot;
+import org.firstinspires.ftc.teamcode.sensors.SensorsCommon;
 import org.firstinspires.ftc.teamcode.vision.Vision;
 
 
@@ -30,8 +31,8 @@ public class RightConeStack extends LinearOpMode {
 
     boolean red=false;
 
-    double driveSpeed = .5;
-    double strafeSpeed = .5;
+    double driveSpeed = .7;
+    double strafeSpeed = .7;
     double liftSpeed = 1;
 
     int pos = 2;
@@ -46,6 +47,8 @@ public class RightConeStack extends LinearOpMode {
         camera.start(hardwareMap);
 
         while (!isStarted()) {
+
+            SensorsCommon.updateDistanceValues();
             pos = camera.getPos();
         }
 
@@ -56,24 +59,54 @@ public class RightConeStack extends LinearOpMode {
 
         closeClaw();
 
-        sleep(1000);
+        //sleep(1000);
 
-        goToPos(liftSpeed, 1, 10);
+        goToPos(liftSpeed, 2, 10);
 
-        AutoCommon.encoderStrafe(strafeSpeed, 10, 1150, true, false, false);
+        AutoCommon.encoderStrafe(strafeSpeed, 10, 2000, true, false, false);
 
-        AutoCommon.encoderDrive(driveSpeed, -200, 10, false);
+        AutoCommon.turnToAngleAuton(0);
+        Thread.sleep(5000);
 
-        AutoCommon.encoderDrive(driveSpeed, 1225, 10, false);
+        AutoCommon.encoderStrafe(driveSpeed, 10, 570, true,false,false);
 
-        AutoCommon.autoDropConeOnJunction(5);
+        AutoCommon.turnToAngleAuton(0);
+
+        AutoCommon.encoderDrive(driveSpeed, 900, 10, false);
+
+        AutoCommon.autoPickDropEnabled=true;
+
+        AutoCommon.autoPickDropAuton(false);
+
+        AutoCommon.encoderDrive(driveSpeed, -500, 10, false);
+
+        AutoCommon.turnToAngleAuton(0);
+
+        AutoCommon.encoderDrive(driveSpeed, -1125, 10, false);
+
+        AutoCommon.turnToAngleAuton(0);
+
+        AutoCommon.turnToAngleAuton(-90);
+
+        Thread.sleep(5000);
+
+        AutoCommon.turnToAngleAuton(0);
+
+        AutoCommon.turnToAngleAuton(0);
+
+        AutoCommon.encoderDrive(driveSpeed, 1125, 10, false);
+
+        AutoCommon.autoPickDropEnabled=true;
+
+        AutoCommon.autoPickDropAuton(false);
+        // AutoCommon.autoDropConeOnJunction(5);
 
 
-        goToPos(liftSpeed, 0, 10);
+      //  goToPos(liftSpeed, 0, 10);
 
-        AutoCommon.driveToEnd(strafeSpeed, pos, true, true);
+      //  AutoCommon.driveToEnd(strafeSpeed, pos, true, true);
 
-        AutoCommon.encoderTurn(.50, -1600, 10);
+      //  AutoCommon.encoderTurn(.50, -1600, 10);
 
     }
 }

@@ -117,9 +117,9 @@ public final class LiftClawCommon {
 
         lengthOfPos = 4;
 
-        /**40:1 Gear Ratio Encoder Values
-         *
-         * LIFT_POSITIONS.put(0,-30);
+        //**40:1 Gear Ratio Encoder Values
+
+        LIFT_POSITIONS.put(0,0);
         LIFT_POSITIONS.put(1, 350);
         LIFT_POSITIONS.put(2, 1400);
         LIFT_POSITIONS.put(3, 2400);
@@ -129,9 +129,9 @@ public final class LiftClawCommon {
         STACK_POSITIONS.put(1, 105);
         STACK_POSITIONS.put(2, 270);
         STACK_POSITIONS.put(3, 380);
-        STACK_POSITIONS.put(4, 540);**/
+        STACK_POSITIONS.put(4, 540);
 
-        //20:1 Gear Ratio Encoder Values
+        /**20:1 Gear Ratio Encoder Values
         LIFT_POSITIONS.put(0,0);
         LIFT_POSITIONS.put(1, 175);
         LIFT_POSITIONS.put(2, 710);
@@ -142,7 +142,7 @@ public final class LiftClawCommon {
         STACK_POSITIONS.put(1, 74);
         STACK_POSITIONS.put(2, 139);
         STACK_POSITIONS.put(3, 208);
-        STACK_POSITIONS.put(4, 281);
+        STACK_POSITIONS.put(4, 281);**/
     }
 
     public static void executeLiftClawTeleop(){
@@ -154,17 +154,23 @@ public final class LiftClawCommon {
         else if(operator.right_bumper )//&& claw_servoValue!=.6)
         {
             closeClaw();
+
+            {
+                lift.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
+                lift.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
+            }
+
         }
 
         if(operator.dpad_up)
         {
-            encoderDrive(1, LIFT_POSITIONS.get(3), 2);
+            encoderDrive(1, LIFT_POSITIONS.get(3), 3);
 
         }
 
         if(operator.dpad_left)
         {
-            encoderDrive(1, LIFT_POSITIONS.get(2),2 );
+            encoderDrive(1, LIFT_POSITIONS.get(2),3);
         }
 
         if(operator.dpad_down)
@@ -234,12 +240,8 @@ public final class LiftClawCommon {
         {
             openClaw();
 
-            encoderDrive(1, LIFT_POSITIONS.get(0), 4);
+            encoderDrive(1, LIFT_POSITIONS.get(0), 3);
             //if(lift.getCurrentPosition()<LIFT_POSITIONS.get(0))
-            {
-                lift.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
-                lift.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
-            }
 
 
         }
@@ -255,7 +257,7 @@ public final class LiftClawCommon {
 
     public static void clearConeStack(boolean checkControls)
     {
-        encoderDrive(.4, STACK_POSITIONS.get(pos)+700, 2,checkControls);
+        encoderDrive(.4, STACK_POSITIONS.get(pos)+350, 2,checkControls);
     }
 
     public static void nextConeInStack(boolean checkControls)
@@ -473,32 +475,17 @@ public final class LiftClawCommon {
             else
             {  // moving down, don't pass zero!
 
-                boolean currentExceeded = false;
-
-                while (curOpMode.opModeIsActive() &&
+                while ((curOpMode.opModeIsActive() &&
                         (runtime.seconds() < timeoutS) &&
-                        lift.isBusy()
-                        && !currentExceeded) {
+                        lift.isBusy())
+                        && lift.getCurrentPosition()>0) {
 
                     // Display it for the driver.
                     checkDriverControls();
 
-                    if(lift.getCurrent(CurrentUnit.AMPS)>maxCurrent)
-                    {
-                        maxCurrent= lift.getCurrent(CurrentUnit.AMPS);
-
-                    }
-
-                    if(maxCurrent>3)
-                    {
-                        currentExceeded=true;
-                    }
                 }
                 lift.setPower(0);
-                if(currentExceeded && lift.getCurrentPosition()>50)
-                {
-                    //encoderDrive(1, lift.getCurrentPosition()+300,3);
-                }
+
 
             }
             // Stop all motion;

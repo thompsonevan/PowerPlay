@@ -41,7 +41,7 @@ public final class LiftClawHardware
         lift = (DcMotorEx) hwMap.get(DcMotor.class, "lift");
 
 
-        lift.setDirection(DcMotor.Direction.FORWARD);// Set to FORWARD if using AndyMark motors
+        lift.setDirection(DcMotor.Direction.REVERSE);// Set to FORWARD if using AndyMark motors
 
         // Set all motors to zero power
         lift.setPower(0);
