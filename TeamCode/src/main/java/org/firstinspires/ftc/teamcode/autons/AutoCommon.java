@@ -212,6 +212,10 @@ public final class AutoCommon {
         return autoOk;
     }
 
+    public static void distanceSensorFailure()
+    {
+
+    }
 
     public static void autoPickDropAuton(boolean teleOp)
     {
@@ -278,9 +282,7 @@ public final class AutoCommon {
         LiftClawCommon.clearConeStack(false);
         if(teleOp) {
             while (continueAutoPick(teleOp)) {
-
                 executeDrive(0, -autoDrivePower);
-
             }
         }
     }
@@ -1001,6 +1003,43 @@ public final class AutoCommon {
                 outerPassed = true;
             }
             if (SensorsCommon.leftVal > 15 && outerPassed) {
+                executeDrive(0,0);
+                isDone = true;
+//                outerPassed = false;
+            }
+        }
+
+        return isDone;
+    }
+
+    public static boolean scanForPoleWithCenter(boolean goingRight){
+
+        SensorsCommon.updateDistanceValues();
+        //double right = leftConeCheck.getDistance(DistanceUnit.INCH);
+        //double left = rightConeCheck.getDistance(DistanceUnit.INCH);
+        //double center = centerCheck.getDistance(DistanceUnit.INCH);
+
+        if (goingRight) {
+            if (SensorsCommon.rightVal > 11.5 && !outerPassed) {
+                executeDrive(.1,0);
+            }
+            if (SensorsCommon.rightVal < 11.5) {
+                outerPassed = true;
+            }
+            if (SensorsCommon.rightVal > 11.5 && outerPassed) {
+                executeDrive(0,0);
+                isDone = true;
+//                outerPassed = false;
+            }
+        } else {
+            if (SensorsCommon.leftVal > 11.5 && !outerPassed) {
+                executeDrive(-.1,0);
+
+            }
+            if (SensorsCommon.leftVal < 11.5) {
+                outerPassed = true;
+            }
+            if (SensorsCommon.leftVal > 11.5 && outerPassed) {
                 executeDrive(0,0);
                 isDone = true;
 //                outerPassed = false;
