@@ -165,13 +165,13 @@ public final class AutoCommon {
     static double liftSpeed=1;
     static double driveSpeed=.5;
 
-    public static void autoDropConeOnJunction(int pos) throws InterruptedException {
-        goToPos(liftSpeed, 4, 10);
+    public static void autoDropConeOnJunction(int pos, boolean right) throws InterruptedException {
+        goToPos(liftSpeed, pos, 10);
 
         boolean done = false;
 
         while(!done){
-            done = scanForPole(false);
+            done = scanForPole(right);
             Thread.sleep(150);
         }
 
@@ -219,6 +219,9 @@ public final class AutoCommon {
         DrivetrainCommon_ALT1.correction=0;
 
         SensorsCommon.updateDistanceValues();
+        if(!teleOp){
+            SensorsCommon.centerVal = 10;
+        }
         LiftClawCommon.reduceConeStackCount();
 
         LiftClawCommon.clearConeStack(false);
@@ -273,12 +276,12 @@ public final class AutoCommon {
         LiftClawCommon.closeClaw();
 
         LiftClawCommon.clearConeStack(false);
+        if(teleOp) {
+            while (continueAutoPick(teleOp)) {
 
-        while (continueAutoPick(teleOp))
-        {
+                executeDrive(0, -autoDrivePower);
 
-            executeDrive(0, -autoDrivePower);
-
+            }
         }
     }
     public static boolean checkConesAuton() {
@@ -345,7 +348,7 @@ public final class AutoCommon {
         else
         {
 
-            autoPickDropEnabled=false;
+//            autoPickDropEnabled=false;
             SensorsHardware.greenLed.setState(false);
             SensorsHardware.redLed.setState(false);
 
@@ -978,27 +981,26 @@ public final class AutoCommon {
         //double left = rightConeCheck.getDistance(DistanceUnit.INCH);
         //double center = centerCheck.getDistance(DistanceUnit.INCH);
 
-        if (goingRight) {
-            if (SensorsCommon.rightVal > 11.5 && !outerPassed) {
-                executeDrive(.1,0);
+        if (!goingRight) {
+            if (SensorsCommon.rightVal > 15 && !outerPassed) {
+                executeDrive(-.1,0);
             }
-            if (SensorsCommon.rightVal < 11.5) {
+            if (SensorsCommon.rightVal < 15) {
                 outerPassed = true;
             }
-            if (SensorsCommon.rightVal > 11.5 && outerPassed) {
+            if (SensorsCommon.rightVal > 15 && outerPassed) {
                 executeDrive(0,0);
                 isDone = true;
 //                outerPassed = false;
             }
         } else {
-            if (SensorsCommon.leftVal > 11.5 && !outerPassed) {
-                executeDrive(-.1,0);
-
+            if (SensorsCommon.leftVal > 15 && !outerPassed) {
+                executeDrive(.1,0);
             }
-            if (SensorsCommon.leftVal < 11.5) {
+            if (SensorsCommon.leftVal < 15) {
                 outerPassed = true;
             }
-            if (SensorsCommon.leftVal > 11.5 && outerPassed) {
+            if (SensorsCommon.leftVal > 15 && outerPassed) {
                 executeDrive(0,0);
                 isDone = true;
 //                outerPassed = false;
@@ -1012,7 +1014,7 @@ public final class AutoCommon {
     public static boolean junctionPassed = false;
 
     public static boolean driveIntoPole(){
-        if (SensorsHardware.junctionDriveDirCheck.getDistance(DistanceUnit.INCH) < 5) {
+        if (SensorsHardware.junctionDriveDirCheck.getDistance(DistanceUnit.INCH) < 3.5) {
             junctionPassed = true;
         }
         if(!junctionPassed){

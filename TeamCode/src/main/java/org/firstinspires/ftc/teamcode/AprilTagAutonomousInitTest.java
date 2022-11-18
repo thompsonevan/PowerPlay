@@ -21,8 +21,11 @@
 
 package org.firstinspires.ftc.teamcode;
 
+import android.annotation.SuppressLint;
+
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
+import com.qualcomm.robotcore.hardware.HardwareMap;
 
 import org.firstinspires.ftc.robotcore.external.hardware.camera.WebcamName;
 import org.firstinspires.ftc.teamcode.vision.AprilTagDetectionPipeline;
@@ -35,7 +38,7 @@ import org.openftc.easyopencv.OpenCvInternalCamera;
 import java.util.ArrayList;
 
 @TeleOp
-public class AprilTagAutonomousInitDetectionExample extends LinearOpMode
+public class AprilTagAutonomousInitTest extends LinearOpMode
 {
     OpenCvCamera camera;
     AprilTagDetectionPipeline aprilTagDetectionPipeline;
@@ -56,16 +59,17 @@ public class AprilTagAutonomousInitDetectionExample extends LinearOpMode
 
     int ID_TAG_OF_INTEREST = 18; // Tag ID 18 from the 36h11 family
 
+    int ID;
+
     AprilTagDetection tagOfInterest = null;
 
     @Override
     public void runOpMode()
     {
         int cameraMonitorViewId = hardwareMap.appContext.getResources().getIdentifier("cameraMonitorViewId", "id", hardwareMap.appContext.getPackageName());
-        //camera = OpenCvCameraFactory.getInstance().createWebcam(hardwareMap.get(WebcamName.class, "Webcam 1"), cameraMonitorViewId);
+        camera = OpenCvCameraFactory.getInstance().createWebcam(hardwareMap.get(WebcamName.class, "Webcam 1"), cameraMonitorViewId);
 
-        camera = OpenCvCameraFactory.getInstance().createInternalCamera(OpenCvInternalCamera.CameraDirection.BACK,cameraMonitorViewId);//.createWebcam(hardwareMap.get(WebcamName.class, "Webcam 1"), cameraMonitorViewId);
-
+//        camera = OpenCvCameraFactory.getInstance().createInternalCamera(OpenCvInternalCamera.CameraDirection.BACK,cameraMonitorViewId);//.createWebcam(hardwareMap.get(WebcamName.class, "Webcam 1"), cameraMonitorViewId);
 
         aprilTagDetectionPipeline = new AprilTagDetectionPipeline(tagsize, fx, fy, cx, cy);
 
@@ -101,12 +105,12 @@ public class AprilTagAutonomousInitDetectionExample extends LinearOpMode
 
                 for(AprilTagDetection tag : currentDetections)
                 {
-                    if(tag.id == ID_TAG_OF_INTEREST)
-                    {
+//                    if(tag.id == ID_TAG_OF_INTEREST)
+//                    {
                         tagOfInterest = tag;
                         tagFound = true;
                         break;
-                    }
+//                    }
                 }
 
                 if(tagFound)
@@ -202,6 +206,123 @@ public class AprilTagAutonomousInitDetectionExample extends LinearOpMode
         while (opModeIsActive()) {sleep(20);}
     }
 
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+    public void startVision(HardwareMap hardwareMap){
+        int cameraMonitorViewId = hardwareMap.appContext.getResources().getIdentifier("cameraMonitorViewId", "id", hardwareMap.appContext.getPackageName());
+        camera = OpenCvCameraFactory.getInstance().createWebcam(hardwareMap.get(WebcamName.class, "Webcam 1"), cameraMonitorViewId);
+
+//        camera = OpenCvCameraFactory.getInstance().createInternalCamera(OpenCvInternalCamera.CameraDirection.BACK,cameraMonitorViewId);//.createWebcam(hardwareMap.get(WebcamName.class, "Webcam 1"), cameraMonitorViewId);
+
+        aprilTagDetectionPipeline = new AprilTagDetectionPipeline(tagsize, fx, fy, cx, cy);
+
+        camera.setPipeline(aprilTagDetectionPipeline);
+        camera.openCameraDeviceAsync(new OpenCvCamera.AsyncCameraOpenListener()
+        {
+            @Override
+            public void onOpened()
+            {
+                camera.startStreaming(864,480, OpenCvCameraRotation.UPRIGHT);
+            }
+
+            @Override
+            public void onError(int errorCode)
+            {
+
+            }
+        });
+
+        telemetry.setMsTransmissionInterval(50);
+
+    }
+
+    public void runVision(){
+        ArrayList<AprilTagDetection> currentDetections = aprilTagDetectionPipeline.getLatestDetections();
+
+        if(currentDetections.size() != 0)
+        {
+            boolean tagFound = false;
+
+            for(AprilTagDetection tag : currentDetections)
+            {
+//                if(tag.id == ID_TAG_OF_INTEREST)
+//                {
+                    ID = tag.id;
+                    tagOfInterest = tag;
+                    tagFound = true;
+                    break;
+//                }
+            }
+
+            if(tagFound)
+            {
+                telemetry.addLine("Tag of interest is in sight!\n\nLocation data:");
+                tagToTelemetry(tagOfInterest);
+            }
+            else
+            {
+                telemetry.addLine("Don't see tag of interest :(");
+
+                if(tagOfInterest == null)
+                {
+                    telemetry.addLine("(The tag has never been seen)");
+                }
+                else
+                {
+                    telemetry.addLine("\nBut we HAVE seen the tag before; last seen at:");
+                    tagToTelemetry(tagOfInterest);
+                }
+            }
+
+        }
+        else
+        {
+            telemetry.addLine("Don't see tag of interest :(");
+
+            if(tagOfInterest == null)
+            {
+                telemetry.addLine("(The tag has never been seen)");
+            }
+            else
+            {
+                telemetry.addLine("\nBut we HAVE seen the tag before; last seen at:");
+                tagToTelemetry(tagOfInterest);
+            }
+
+        }
+
+//        telemetry.update();
+        sleep(20);
+    }
+
+    public int getPos(){
+        return ID - 41;
+    }
+
+    @SuppressLint("DefaultLocale")
     void tagToTelemetry(AprilTagDetection detection)
     {
         telemetry.addLine(String.format("\nDetected tag ID=%d", detection.id));

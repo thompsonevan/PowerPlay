@@ -117,9 +117,8 @@ public final class LiftClawCommon {
 
         lengthOfPos = 4;
 
-        /**40:1 Gear Ratio Encoder Values
-         *
-         * LIFT_POSITIONS.put(0,-30);
+//        40:1 Gear Ratio Encoder Values
+         LIFT_POSITIONS.put(0,-30);
         LIFT_POSITIONS.put(1, 350);
         LIFT_POSITIONS.put(2, 1400);
         LIFT_POSITIONS.put(3, 2400);
@@ -129,20 +128,20 @@ public final class LiftClawCommon {
         STACK_POSITIONS.put(1, 105);
         STACK_POSITIONS.put(2, 270);
         STACK_POSITIONS.put(3, 380);
-        STACK_POSITIONS.put(4, 540);**/
+        STACK_POSITIONS.put(4, 540);
 
         //20:1 Gear Ratio Encoder Values
-        LIFT_POSITIONS.put(0,0);
-        LIFT_POSITIONS.put(1, 175);
-        LIFT_POSITIONS.put(2, 710);
-        LIFT_POSITIONS.put(3, 1210);
-        LIFT_POSITIONS.put(4, 1710);
-
-        STACK_POSITIONS.put(0,0);
-        STACK_POSITIONS.put(1, 74);
-        STACK_POSITIONS.put(2, 139);
-        STACK_POSITIONS.put(3, 208);
-        STACK_POSITIONS.put(4, 281);
+//        LIFT_POSITIONS.put(0,0);
+//        LIFT_POSITIONS.put(1, 175);
+//        LIFT_POSITIONS.put(2, 710);
+//        LIFT_POSITIONS.put(3, 1210);
+//        LIFT_POSITIONS.put(4, 1710);
+//
+//        STACK_POSITIONS.put(0,0);
+//        STACK_POSITIONS.put(1, 74);
+//        STACK_POSITIONS.put(2, 139);
+//        STACK_POSITIONS.put(3, 208);
+//        STACK_POSITIONS.put(4, 281);
     }
 
     public static void executeLiftClawTeleop(){

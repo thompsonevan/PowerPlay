@@ -4,6 +4,8 @@ import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.util.ElapsedTime;
 
+import org.firstinspires.ftc.teamcode.AprilTagAutonomousInitTest;
+
 @Autonomous(name="Scan Test", group="OnBot")
 
 public class TestForScan extends LinearOpMode {
@@ -16,20 +18,23 @@ public class TestForScan extends LinearOpMode {
     double driveSpeed = .5;
     double strafeSpeed = .5;
 
+    AprilTagAutonomousInitTest april = new AprilTagAutonomousInitTest();
+
+    int pos;
+
     @Override
     public void runOpMode() {
+//        AutoCommon.resetEncoders();
 
-     
-        AutoCommon.resetEncoders();
+        april.startVision(hardwareMap);
+
+        while(!isStarted() && !isStopRequested()){
+            april.runVision();
+            pos = april.getPos();
+            telemetry.addData("ID", pos);
+            telemetry.update();
+        }
 
         waitForStart();
-
-//        AutoCommon.isDone = false;
-//
-//        sleep(1000);
-//
-//        AutoCommon.encoderStrafe(.2, 10, 750, false, false, false);
-//
-        while(!AutoCommon.scanForPole(true));
     }
 }

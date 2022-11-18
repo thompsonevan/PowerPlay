@@ -66,8 +66,7 @@ public class RightConeStack extends LinearOpMode {
 
         AutoCommon.encoderDrive(driveSpeed, 1225, 10, false);
 
-        AutoCommon.autoDropConeOnJunction(5);
-
+        AutoCommon.autoDropConeOnJunction(5, false);
 
         goToPos(liftSpeed, 0, 10);
 
