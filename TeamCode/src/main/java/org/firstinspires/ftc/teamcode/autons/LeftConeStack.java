@@ -97,9 +97,11 @@ public class LeftConeStack extends LinearOpMode {
 
                 AutoCommon.encoderDrive(driveSpeed, -300, 10, false);
 
-                AutoCommon.encoderStrafe(strafeSpeed, 10, 500, false, false, false);
+                AutoCommon.turnToAngleAuton(0);
 
-                AutoCommon.encoderDrive(driveSpeed, 900, 10, false);
+                AutoCommon.encoderStrafe(strafeSpeed, 10, 600, false, false, false);
+
+                AutoCommon.encoderDrive(driveSpeed, 800, 10, false);
 
                 AutoCommon.turnToAngleAuton(0);
 
@@ -116,6 +118,9 @@ public class LeftConeStack extends LinearOpMode {
                 AutoCommon.encoderStrafe(strafeSpeed, 10, 350, true, false, false);
 
                 goToPos(liftSpeed, 3, 10);
+
+                AutoCommon.junctionPassed = false;
+                AutoCommon.isIn = false;
 
                 done = false;
 
@@ -141,11 +146,21 @@ public class LeftConeStack extends LinearOpMode {
 
                         AutoCommon.encoderDrive(driveSpeed, -300, 10, false);
 
-                        goToPos(liftSpeed, 0, 10);
+                        AutoCommon.encoderStrafe(strafeSpeed, 10, 650, false, false, false);
+//
+//                        AutoCommon.turnToAngleAuton(0);
+//
+//                        AutoCommon.encoderDrive(driveSpeed, 2000, 10, false);
+//
+//                        AutoCommon.autoPickDropEnabled = true;
+//
+//                        AutoCommon.autoPickDropAuton(false);
+//
+//                        AutoCommon.encoderDrive(driveSpeed, -500, 10, false);
 
-                        AutoCommon.encoderStrafe(strafeSpeed, 10, 500, false, false, false);
+//                        AutoCommon.turnToAngleAuton(0);
 
-                        AutoCommon.encoderDrive(driveSpeed, 2-pos * (1200), 10, false);
+                        AutoCommon.encoderDrive(driveSpeed, 2-pos * (-1000), 10, false);
 
                         goToPos(liftSpeed, 0, 10);
                     }

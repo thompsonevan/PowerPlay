@@ -254,7 +254,7 @@ public final class LiftClawCommon {
 
     public static void clearConeStack(boolean checkControls)
     {
-        encoderDrive(.4, STACK_POSITIONS.get(pos)+700, 2,checkControls);
+        encoderDrive(.4, STACK_POSITIONS.get(pos)+500, 2,checkControls);
     }
 
     public static void nextConeInStack(boolean checkControls)

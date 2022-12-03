@@ -8,8 +8,11 @@ import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.util.ElapsedTime;
 
+import org.firstinspires.ftc.robotcore.external.navigation.DistanceUnit;
 import org.firstinspires.ftc.teamcode.AprilTagAutonomousInitTest;
 import org.firstinspires.ftc.teamcode.Robot;
+import org.firstinspires.ftc.teamcode.sensors.SensorsCommon;
+import org.firstinspires.ftc.teamcode.sensors.SensorsHardware;
 import org.firstinspires.ftc.teamcode.vision.Vision;
 
 
@@ -48,10 +51,29 @@ public class ERightConeStack extends LinearOpMode {
         april.startVision(hardwareMap);
 
         while(!isStarted() && !isStopRequested()){
+
+
+            SensorsCommon.leftVal = SensorsHardware.leftConeCheck.getDistance(DistanceUnit.INCH);
+            SensorsCommon.leftValBU = SensorsHardware.leftConeCheckBU.getDistance(DistanceUnit.INCH);
+            SensorsCommon.rightVal = SensorsHardware.rightConeCheck.getDistance(DistanceUnit.INCH);
+            SensorsCommon.rightValBU = SensorsHardware.rightConeCheckBU.getDistance(DistanceUnit.INCH);
+          //  SensorsCommon.centerVal = SensorsHardware.centerCheck.getDistance(DistanceUnit.INCH);
+
+            Robot.curOpMode.telemetry.addData("leftCheck:",SensorsCommon.leftVal);
+            Robot.curOpMode.telemetry.addData("leftCheckBU:",SensorsCommon.leftValBU);
+            Robot.curOpMode.telemetry.addData("rightCheck:",SensorsCommon.rightVal);
+            Robot.curOpMode.telemetry.addData("rightCheckBU:",SensorsCommon.rightValBU);
+           // Robot.curOpMode.telemetry.addData("centerCheck:",SensorsCommon.centerVal);
+//            Robot.curOpMode.telemetry.addData("Junction:",SensorsHardware.junctionDriveDirCheck.getDistance(DistanceUnit.INCH));
+//            Robot.curOpMode.telemetry.addData("JunctionBU:",SensorsHardware.junctionDriveDirCheckBU.getDistance(DistanceUnit.INCH));
+
             april.runVision();
             pos = april.getPos();
             telemetry.addData("ID", pos);
             telemetry.update();
+            if(pos == -41){
+                pos = 1;
+            }
         }
 
         telemetry.addData("pos", pos);
@@ -98,7 +120,7 @@ public class ERightConeStack extends LinearOpMode {
 
                 AutoCommon.encoderDrive(driveSpeed, -300, 10, false);
 
-                AutoCommon.encoderStrafe(strafeSpeed, 10, 500, true, false, false);
+                AutoCommon.encoderStrafe(strafeSpeed, 10, 600, true, false, false);
 
                 AutoCommon.encoderDrive(driveSpeed, 900, 10, false);
 
@@ -142,11 +164,19 @@ public class ERightConeStack extends LinearOpMode {
 
                         AutoCommon.encoderDrive(driveSpeed, -300, 10, false);
 
-                        goToPos(liftSpeed, 0, 10);
+                        AutoCommon.encoderStrafe(strafeSpeed, 10, 500, true, false, false);
 
-                        AutoCommon.encoderStrafe(strafeSpeed, 10, 500, false, false, false);
+//                        AutoCommon.encoderDrive(driveSpeed, 2000, 10, false);
+//
+//                        AutoCommon.autoPickDropEnabled = true;
+//
+//                        AutoCommon.autoPickDropAuton(false);
+//
+//                        AutoCommon.encoderDrive(driveSpeed, -500, 10, false);
 
-                        AutoCommon.encoderDrive(driveSpeed, pos * (1200), 10, false);
+                        AutoCommon.turnToAngleAuton(0);
+
+                        AutoCommon.encoderDrive(driveSpeed, pos * (1000), 10, false);
 
                         goToPos(liftSpeed, 0, 10);
                     }

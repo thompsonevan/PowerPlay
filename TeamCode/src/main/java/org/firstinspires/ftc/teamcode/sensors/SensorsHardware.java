@@ -2,15 +2,24 @@ package org.firstinspires.ftc.teamcode.sensors;
 
 import static org.firstinspires.ftc.teamcode.Robot.hwMap;
 
+import com.qualcomm.robotcore.hardware.ColorRangeSensor;
 import com.qualcomm.robotcore.hardware.DigitalChannel;
 import com.qualcomm.robotcore.hardware.DistanceSensor;
 
 public final class SensorsHardware {
 
+
     public static DistanceSensor leftConeCheck;
+    public static DistanceSensor leftConeCheckBU;
     public static DistanceSensor rightConeCheck;
+    public static DistanceSensor rightConeCheckBU;
     public static DistanceSensor centerCheck;
-    public static DistanceSensor junctionDriveDirCheck;
+    public static DistanceSensor centerCheckBU;
+
+   // public static ColorRangeSensor centerCheck;
+//
+//    public static DistanceSensor junctionDriveDirCheck;
+//    public static DistanceSensor junctionDriveDirCheckBU;
 
     public static DigitalChannel redLed;
     public static DigitalChannel greenLed;
@@ -35,9 +44,14 @@ public final class SensorsHardware {
     public static void initSensorsHardware()
     {
         leftConeCheck = hwMap.get(DistanceSensor.class, "leftConeCheck");
+        leftConeCheckBU = hwMap.get(DistanceSensor.class, "leftConeCheckBU");
         rightConeCheck = hwMap.get(DistanceSensor.class, "rightConeCheck");
-        junctionDriveDirCheck = hwMap.get(DistanceSensor.class, "junctionDriveDirCheck");
+        rightConeCheckBU = hwMap.get(DistanceSensor.class, "rightConeCheckBU");
+//        junctionDriveDirCheck = hwMap.get(DistanceSensor.class, "junctionDriveDirCheck");
+//        junctionDriveDirCheckBU = hwMap.get(DistanceSensor.class, "junctionDriveDirCheckBU");
         centerCheck = hwMap.get(DistanceSensor.class, "centerCheck");
+        centerCheckBU = hwMap.get(DistanceSensor.class, "centerCheckBU");
+
 
         redLed = hwMap.get(DigitalChannel.class, "red");
         greenLed = hwMap.get(DigitalChannel.class, "green");
